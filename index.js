@@ -46,9 +46,7 @@ imgi.onload = function () {
   //  ct.width = 60;
     //ct.height =60;
   flashenSvg();
-
   //  canToFlashen(ct.getImageData(0, 0, img.width, img.height));
-
 };
 
 imgi.src =  'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'//'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
@@ -116,8 +114,8 @@ function flashenSvg(){
       }
     }
 
-
-    var imgdat = (ct.getImageData(0, 0, imgi.width, imgi.height))
+    var imgdat = (ct.getImageData(0, 0,
+            imgi.width, imgi.height))
     canToFlashen(imgdat);
 
     drawFlash(pixels)
@@ -127,6 +125,7 @@ function flashenSvg(){
 
 
 setupInput();
+
 var canny = document.getElementById('mycanvas')
 var ct = canny.getContext('2d')
 //console.log(ct.getImageData(0, 0, 200, 200))
@@ -164,6 +163,7 @@ function drawFlash(data){
 
 }
 
+
 function canToFlashen(imgdat){
 
   var imageWidth = imgdat.width;
@@ -172,7 +172,7 @@ function canToFlashen(imgdat){
 
   var yoff = Math.floor(imageHeight/screenHeight);
 
-  console.log(xoff, yoff)
+//  console.log(xoff, yoff)
 //  console.log(img.data[130], img.data[144], img.data[1322], img.data[3])
 //for(i of img.data){
 //  console.log(i)
@@ -193,11 +193,13 @@ function canToFlashen(imgdat){
 }
 
 
+
+
 function setupInput(){
   var linkinput = d3.select('#linkin');
   linkinput.on('keydown', function(err,d ,e){
     var linkinput = d3.select('#linkin');
-    console.log(linkinput[0][0].value)
+//    console.log(linkinput[0][0].value)
   })
   //console.log(linkinput.value)
   linkinput[0][0].value = imgi.src;
@@ -213,6 +215,38 @@ d3.select('#urlbut')
 
   })
 
+d3.select('#updateBut')
+  .on('click', function(d){
+
+    sendToFlaschen(pixels)
+
+  })
+
+
+d3.select('#contcheck')
+  .on('change', function(d, i){
+    console.log('checkedout', d, this.checked)
+    if( this.checked ){
+      keepsending();
+
+     }
+
+  })
+var t;
+function keepsending() {
+
+  sendToFlaschen(pixels);
+  console.log('is it still checked', d3.select('#contcheck')[0][0].checked)
+
+setTimeout(function(elap){
+   if( !(d3.select('#contcheck')[0][0].checked) ){
+    // t.stop();
+   }
+   else{
+    keepsending();
+  }
+  }, 4500)
+}
 
 
   function sendToFlaschen(data){
