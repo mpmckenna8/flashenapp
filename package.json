@@ -1,0 +1,25 @@
+{
+  "name": "flashapp",
+  "version": "0.0.1",
+  "productName": "Flaschenapp",
+  "devDependencies": {
+    "electron": "1.4.13"
+  },
+  "description": "\"Desktop app to f with the flashentaschen\"",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "flaschentaschen",
+    "udp",
+    "ppm"
+  ],
+  "author": "mpmckenna8",
+  "license": "ISC",
+  "dependencies": {
+    "cat-picture": "^5.1.2",
+    "electron": "^1.6.2",
+    "lightning-image-poly": "0.0.10"
+  }
+}
