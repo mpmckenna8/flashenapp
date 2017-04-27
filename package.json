@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "productName": "Flaschenapp",
   "devDependencies": {
-    "electron": "1.4.13"
+    "electron": "1.4.15"
   },
   "description": "\"Desktop app to f with the flashentaschen\"",
   "main": "app.js",
@@ -18,8 +18,9 @@
   "author": "mpmckenna8",
   "license": "ISC",
   "dependencies": {
-    "cat-picture": "^5.1.2",
-    "electron": "^1.6.2",
-    "lightning-image-poly": "0.0.10"
+    "electron": "^1.4.15",
+    "d3": "4.8.0",
+    "lightning-image-poly": "0.0.10",
+    "flaschenode": "0.0.4"
   }
 }

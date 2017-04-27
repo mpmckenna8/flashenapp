@@ -1,5 +1,5 @@
 var flash = require('flaschenode');
-var picture = require('cat-picture');
+//var picture = require('cat-picture');
 var d3 = require('d3');
 var image = require('lightning-image-poly');
 var pixel = require('./pixer.js');
@@ -10,7 +10,7 @@ flash.layer = 15;
 flash.init();
 console.log(flash.hostname)
 
-var datb = new Buffer( flash.headerString().length+ flash.footerString().length + flash.height* flash.width*3)
+var datb = Buffer.alloc( flash.headerString().length+ flash.footerString().length + flash.height* flash.width*3)
 
 flash.data = datb;
 
@@ -19,14 +19,15 @@ var starfoo = datb.length - flash.footerString().length
 datb.write(flash.footerString(), starfoo);
 
 
-var src = picture.src;
+var src = "https://static.pexels.com/photos/17767/pexels-photo.jpg";
 
-var grafi = require('grafi');
-var eightBit = require('8bit')
+//var grafi = require('grafi');
+//var eightBit = require('8bit')
 let svg;
 
-picture.remove();
+//picture.remove();
 
+console.log('new try with src, ', src)
 var counter = 0;
 
 
@@ -168,6 +169,7 @@ function canToFlashen(imgdat){
 
   var imageWidth = imgdat.width;
   var imageHeight = imgdat.height;
+
   var xoff = Math.floor(imageWidth/screenWidth);
 
   var yoff = Math.floor(imageHeight/screenHeight);
@@ -183,9 +185,9 @@ function canToFlashen(imgdat){
   for(y = 0; y < screenHeight; y++){
     for(x=0; x < screenWidth; x++){
         var indi = ((xoff) * x * 4 +  (yoff * imageWidth)*y*4 )
+
       //  console.log(counter, x, y, indi);
         //counter= counter+1;
-
         pixels[x + y*screenWidth].color = [imgdat.data[indi], imgdat.data[indi+1], imgdat.data[indi+2]]
     }
   }
@@ -226,6 +228,8 @@ d3.select('#updateBut')
 d3.select('#contcheck')
   .on('change', function(d, i){
     console.log('checkedout', d, this.checked)
+    flashenSvg();
+
     if( this.checked ){
       keepsending();
 
@@ -235,7 +239,7 @@ d3.select('#contcheck')
 var t;
 function keepsending() {
 
-  sendToFlaschen(pixels);
+  flashenSvg();
   console.log('is it still checked', d3.select('#contcheck')[0][0].checked)
 
 setTimeout(function(elap){
@@ -243,9 +247,10 @@ setTimeout(function(elap){
     // t.stop();
    }
    else{
+
     keepsending();
   }
-  }, 4500)
+}, 200)
 }
 
 
@@ -264,4 +269,106 @@ setTimeout(function(elap){
       }
     }
     flash.show();
+  }
+
+
+  var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  var analyser = audioCtx.createAnalyser();
+  var canvas = document.querySelector('#mycanvas');
+  var canvasCtx = canvas.getContext("2d");
+  var  WIDTH = canvas.width;
+   var HEIGHT = canvas.height;
+  var intendedWidth = document.querySelector('.visualizer').clientWidth;
+  console.log(intendedWidth)
+
+  var stream;
+  var drawVisual;
+
+  if (navigator.getUserMedia) {
+     console.log('getUserMedia supported.');
+     navigator.getUserMedia (
+        // constraints - only audio needed for this app
+        {
+           audio: true
+        },
+
+        // Success callback
+        function(stream) {
+           source = audioCtx.createMediaStreamSource(stream);
+          // source.connect(analyser);
+       //    analyser.connect(distortion);
+       //    distortion.connect(biquadFilter);
+        //   biquadFilter.connect(convolver);
+        //   convolver.connect(gainNode);
+        //   gainNode.connect(audioCtx.destination);
+
+        //	 visualize();
+          // voiceChange();
+
+  	var analyser = audioCtx.createAnalyser();
+  	analyser.minDecibels = -90;
+  analyser.maxDecibels = -10;
+  analyser.smoothingTimeConstant = 0.85;
+
+  canvas.setAttribute('width',intendedWidth);
+
+
+  source.connect(analyser);
+  //analyser.connect(distortion);
+  // etc.
+
+  analyser.fftSize = 2048;
+  var bufferLength = analyser.frequencyBinCount;
+  var dataArray = new Uint8Array(bufferLength);
+
+  analyser.getByteTimeDomainData(dataArray);
+
+
+
+  canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+
+
+  function draw() {
+  	drawVisual = requestAnimationFrame(draw);
+  analyser.getByteTimeDomainData(dataArray);
+
+  canvasCtx.fillStyle = 'rgb(0, 200, 200)';
+        canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+  	canvasCtx.lineWidth = 6;
+        canvasCtx.strokeStyle = 'rgb(255, 0, 0)';
+
+        canvasCtx.beginPath();
+
+  var sliceWidth = WIDTH * 1.0 / bufferLength;
+        var x = 0;
+
+        for(var i = 0; i < bufferLength; i++) {
+
+          var v = dataArray[i] / 128.0;
+          var y = v * HEIGHT/2;
+
+          if(i === 0) {
+            canvasCtx.moveTo(x, y);
+          } else {
+            canvasCtx.lineTo(x, y);
+          }
+
+          x += sliceWidth;
+        }
+        canvasCtx.lineTo(canvas.width, canvas.height/2);
+        canvasCtx.stroke();
+
+
+
+  }
+  draw();
+        },
+
+        // Error callback
+        function(err) {
+           console.log('The following gUM error occured: ' + err);
+        }
+     );
+  } else {
+     console.log('getUserMedia not supported on your browser!');
   }
