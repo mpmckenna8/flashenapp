@@ -18,8 +18,8 @@
   "author": "mpmckenna8",
   "license": "ISC",
   "dependencies": {
-    "cat-picture": "^5.1.2",
+    "d3": "4.8.0",
     "electron": "^1.6.2",
-    "lightning-image-poly": "0.0.10"
+    "flaschenode": "0.0.4"
   }
 }

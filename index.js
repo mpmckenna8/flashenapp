@@ -1,16 +1,13 @@
 var flash = require('flaschenode');
-var picture = require('cat-picture');
 var d3 = require('d3');
-var image = require('lightning-image-poly');
 var pixel = require('./pixer.js');
 
 
-//console.log(pixel.toString());
 flash.layer = 15;
 flash.init();
 console.log(flash.hostname)
 
-var datb = new Buffer( flash.headerString().length+ flash.footerString().length + flash.height* flash.width*3)
+var datb = Buffer.alloc( flash.headerString().length+ flash.footerString().length + flash.height* flash.width*3)
 
 flash.data = datb;
 
@@ -18,17 +15,14 @@ datb.write(flash.headerString(), 0);
 var starfoo = datb.length - flash.footerString().length
 datb.write(flash.footerString(), starfoo);
 
+var src = "https://static.pexels.com/photos/17767/pexels-photo.jpg";
 
-var src = picture.src;
-
-var grafi = require('grafi');
-var eightBit = require('8bit')
 let svg;
 
-picture.remove();
+//picture.remove();
 
+console.log('new try with src, ', src)
 var counter = 0;
-
 
 
 var viz = {} //new image('#visualization', null, [src], {hullAlgorithm: 'convex'});
@@ -57,35 +51,15 @@ var remote = require('electron').remote;
 var fs = require('fs');
 
 
-function save(){
-    remote.getCurrentWindow().webContents.printToPDF(
-      {
-      portrait:true
-      },
-      function(err, data){
-    //    fs.writeFile('annotation.pdf', data, function(err){
-        if (err){ alert('error generating pdf! ' + err.msg)}
-        else console.log('pressed f')//alert('pdf saved! check out your cat');
-    //  })
-  })
-}
-
-
-
-
 window.addEventListener('keydown',function(e){
  console.log('keycode=', e.keyCode);
-    if(e.keyCode == 80) save();
+    if(e.keyCode == 80) console.log('pressed save thing') //save();
     else if(e.keyCode == 70){
       const footer = new Buffer(flash.footerString())
-
       var srcData = src;
       var allcon; // to hold the final buffer to send
-
     }
   })
-
-
 
 
 var screenWidth;
@@ -168,6 +142,7 @@ function canToFlashen(imgdat){
 
   var imageWidth = imgdat.width;
   var imageHeight = imgdat.height;
+
   var xoff = Math.floor(imageWidth/screenWidth);
 
   var yoff = Math.floor(imageHeight/screenHeight);
@@ -183,9 +158,9 @@ function canToFlashen(imgdat){
   for(y = 0; y < screenHeight; y++){
     for(x=0; x < screenWidth; x++){
         var indi = ((xoff) * x * 4 +  (yoff * imageWidth)*y*4 )
+
       //  console.log(counter, x, y, indi);
         //counter= counter+1;
-
         pixels[x + y*screenWidth].color = [imgdat.data[indi], imgdat.data[indi+1], imgdat.data[indi+2]]
     }
   }
@@ -226,6 +201,8 @@ d3.select('#updateBut')
 d3.select('#contcheck')
   .on('change', function(d, i){
     console.log('checkedout', d, this.checked)
+    flashenSvg();
+
     if( this.checked ){
       keepsending();
 
@@ -235,7 +212,7 @@ d3.select('#contcheck')
 var t;
 function keepsending() {
 
-  sendToFlaschen(pixels);
+  flashenSvg();
   console.log('is it still checked', d3.select('#contcheck')[0][0].checked)
 
 setTimeout(function(elap){
@@ -243,9 +220,10 @@ setTimeout(function(elap){
     // t.stop();
    }
    else{
+
     keepsending();
   }
-  }, 4500)
+}, 200)
 }
 
 
