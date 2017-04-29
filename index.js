@@ -20,36 +20,29 @@ var src = "https://static.pexels.com/photos/17767/pexels-photo.jpg";
 let svg;
 
 //picture.remove();
-
 console.log('new try with src, ', src)
 var counter = 0;
 
-
 var viz = {} //new image('#visualization', null, [src], {hullAlgorithm: 'convex'});
 
-
 var imgi = new Image();
-
-
 
 
 imgi.onload = startDraw;
 imgi.src =  'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'//'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
 //console.log(img)
-//d3.select('#imgholder').attr('src', imgi.src)
 var dimg;
+
 function startDraw(){
 
    dimg = d3.select('#imgholder').attr('src', imgi.src)
 
-
    paintCanvas();
-
 }
 
 
-function paintCanvas(){
 
+function paintCanvas(){
   console.log('img url = ', imgi)
 //  requestAnimationFrame(paintCanvas)
 // url.value need to set to do the figs
@@ -67,8 +60,8 @@ if((imgi.src).split('.')[linksplit.length-1] !== 'gif'){
     //ct.height =60;
   }
   else{
-    loadGIF();
 
+    loadGIF();
     console.log('deal with gif gosh darn')
   }
 
@@ -221,9 +214,10 @@ d3.select('#urlbut')
       imgi.src = linkinpu[0][0].value;
     }
     else{
-      imgi.src = linkinpu[0][0].value;
+    //  imgi.src = linkinpu[0][0].value;
 
       url.value = linkinpu[0][0].value
+
       console.log('need to do gif stuff')
       //c = canny;
     }
