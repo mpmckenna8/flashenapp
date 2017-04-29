@@ -16,6 +16,7 @@ datb.write(flash.headerString(), 0)
 var starfoo = datb.length - flash.footerString().length
 datb.write(flash.footerString(), starfoo)
 
+<<<<<<< 85bef9da5e61181d163b9e9cf55d299ab4afa2ca
 var src = 'https://static.pexels.com/photos/17767/pexels-photo.jpg'
 let svg
 
@@ -52,7 +53,6 @@ d3.select('#layerselect') .on('change', function(d){
 
 
 
-
 // handle when an image is loaded.
 imgi.onload = function () {
   canny.width = imgi.width
@@ -60,7 +60,9 @@ imgi.onload = function () {
 
   ct.drawImage(imgi, 0, 0)
   //  console.log(ct.getImageData(0, 0, img.width, img.height))
-  flashenSvg()
+
+  flashenSvg();
+
 }
 
 imgi.src = 'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'// 'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
@@ -185,6 +187,7 @@ function setupInput () {
 
 
 
+<<<<<<< 85bef9da5e61181d163b9e9cf55d299ab4afa2ca
 // Handle click on the button to update the flashentaschen
 d3.select('#updateBut')
   .on('click', function (d) {
@@ -196,6 +199,21 @@ d3.select('#contcheck')
   .on('change', function (d, i) {
     console.log('checkedout', d, this.checked)
     flashenSvg()
+=======
+    var linksplit = (linkinpu[0][0].value).split('.')
+    console.log('update image with', (linkinpu[0][0].value).split('.')[linksplit.length -1])
+    if( linksplit[linksplit.length-1] !== 'gif'){
+      imgi.src = linkinpu[0][0].value;
+    }
+    else{
+    //  imgi.src = linkinpu[0][0].value;
+
+      url.value = linkinpu[0][0].value
+
+      console.log('need to do gif stuff')
+      //c = canny;
+    }
+>>>>>>> just commiting so i can change branches
 
     if (this.checked) {
       keepsending()
