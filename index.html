@@ -2,6 +2,8 @@
 <html>
 <head>
   <link href="stylesheet.css" rel="stylesheet">
+  <script src="gifuct-js.js"></script>
+
 </head>
 <body>
   <h1>Flashentashen imglink</h1>
@@ -22,7 +24,30 @@
   </div>
   <div id='visualization'></div>
   <p>Image from the internet</p>
-  <canvas id="mycanvas" class="visualizer" ></canvas>
+  <canvas id="mycanvas" class="visualizer" >
+  </canvas>
+
+  <img id="imgholder"></img>
+
+
+
+  <div>
+  <canvas id="c"></canvas>
+</div>
+<div style="margin: 10px 0;">
+  <input id="url" type="text"/>
+  <button onclick="loadGIF()">Load</button>
+  <button onclick="playpause()">Play/Pause</button>
+</div>
+<div style="margin-bottom: 10px;">
+  <input id="grayscale" type="checkbox" onchange="bEdgeDetect = !bEdgeDetect"> Edge Detect
+  <input id="invert" type="checkbox" onchange="bInvert = !bInvert;"> Invert Colours
+  <input id="grayscale" type="checkbox" onchange="bGrayscale = !bGrayscale"> Grayscale
+</div>
+<div>
+  <input id="pixels" type="range" min="0" max="100" step="1" value="100" oninput="pixelPercent = value;"> Pixelate Amount
+</div>
+
 
   <script type="text/javascript" src="index.js"></script>
 

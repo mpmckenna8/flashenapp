@@ -20,6 +20,7 @@
   "dependencies": {
     "d3": "4.8.0",
     "electron": "^1.6.2",
-    "flaschenode": "0.0.4"
+    "flaschenode": "0.0.4",
+    "gif.jsify": "^0.1.6"
   }
 }
