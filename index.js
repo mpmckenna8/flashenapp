@@ -2,6 +2,7 @@ var flash = require('flaschenode');
 var d3 = require('d3');
 var pixel = require('./pixer.js');
 
+var refreshDelay = 500;
 
 flash.layer = 15;
 flash.init();
@@ -15,11 +16,9 @@ datb.write(flash.headerString(), 0);
 var starfoo = datb.length - flash.footerString().length
 datb.write(flash.footerString(), starfoo);
 
+
 var src = "https://static.pexels.com/photos/17767/pexels-photo.jpg";
-
 let svg;
-
-//picture.remove();
 
 console.log('new try with src, ', src)
 var counter = 0;
@@ -30,6 +29,7 @@ var viz = {} //new image('#visualization', null, [src], {hullAlgorithm: 'convex'
 
 var imgi = new Image();
 
+// handle when an image is loaded.
 imgi.onload = function () {
   canny.width = imgi.width;
   canny.height = imgi.height
@@ -37,8 +37,6 @@ imgi.onload = function () {
   //  eightBit(document.getElementById('mycanvas'), img, 114);
   ct.drawImage(imgi, 0, 0);
   //  console.log(ct.getImageData(0, 0, img.width, img.height))
-  //  ct.width = 60;
-    //ct.height =60;
   flashenSvg();
   //  canToFlashen(ct.getImageData(0, 0, img.width, img.height));
 };
@@ -46,10 +44,8 @@ imgi.onload = function () {
 imgi.src =  'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'//'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
 //console.log(img)
 
-
 var remote = require('electron').remote;
 var fs = require('fs');
-
 
 window.addEventListener('keydown',function(e){
  console.log('keycode=', e.keyCode);
@@ -88,17 +84,14 @@ function flashenSvg(){
       }
     }
 
-    var imgdat = (ct.getImageData(0, 0,
-            imgi.width, imgi.height))
+    var imgdat = ct.getImageData(0, 0, imgi.width, imgi.height)
+
     canToFlashen(imgdat);
 
     drawFlash(pixels)
 
 }
 
-
-
-setupInput();
 
 var canny = document.getElementById('mycanvas')
 var ct = canny.getContext('2d')
@@ -113,7 +106,6 @@ function drawFlash(data){
 
     pixs.enter().append('rect')
       .attr('x', function(d){
-      //  console.log(d)
     //  console.log(d)
         return width*d.xin ;
       })
@@ -131,28 +123,19 @@ function drawFlash(data){
       .attr('stroke', 'blue')
       .attr('fill', function(d){
       //  console.log(d.color)
-
         return d3.rgb(d.color[0], d.color[1], d.color[2])
       })
 
 }
 
-
+// my kind of lazy sampling of the canvas
 function canToFlashen(imgdat){
-
   var imageWidth = imgdat.width;
   var imageHeight = imgdat.height;
 
   var xoff = Math.floor(imageWidth/screenWidth);
 
   var yoff = Math.floor(imageHeight/screenHeight);
-
-//  console.log(xoff, yoff)
-//  console.log(img.data[130], img.data[144], img.data[1322], img.data[3])
-//for(i of img.data){
-//  console.log(i)
-//
-//}
 
 // each x picwel we need to go four through * imageWidth/screenHeight
   for(y = 0; y < screenHeight; y++){
@@ -161,12 +144,12 @@ function canToFlashen(imgdat){
 
       //  console.log(counter, x, y, indi);
         //counter= counter+1;
-        pixels[x + y*screenWidth].color = [imgdat.data[indi], imgdat.data[indi+1], imgdat.data[indi+2]]
+        pixels[x + y*screenWidth].color = [imgdat.data[indi],
+                                      imgdat.data[indi+1], imgdat.data[indi+2]]
     }
   }
   sendToFlaschen(pixels)
 }
-
 
 
 
@@ -181,23 +164,23 @@ function setupInput(){
 }
 
 
+// Handle the action of setting a new image source.
 d3.select('#urlbut')
   .on('click', function(d){
     var linkinpu = d3.select('#linkin');
-    var newlink = linkinpu.attr('text')
-    console.log('update image with', linkinpu[0][0].value)
+  //  var newlink = linkinpu.attr('value')
+    //  console.log('update image with', linkinpu[0][0].value, newlink)
     imgi.src = linkinpu[0][0].value;
 
   })
 
+// Handle click on the button to update the flashentaschen
 d3.select('#updateBut')
   .on('click', function(d){
-
     sendToFlaschen(pixels)
-
   })
 
-
+// When the check box if checkeud handle refreshing the flashentaschen or not
 d3.select('#contcheck')
   .on('change', function(d, i){
     console.log('checkedout', d, this.checked)
@@ -205,29 +188,26 @@ d3.select('#contcheck')
 
     if( this.checked ){
       keepsending();
-
      }
 
   })
-var t;
+
 function keepsending() {
-
   flashenSvg();
-  console.log('is it still checked', d3.select('#contcheck')[0][0].checked)
-
-setTimeout(function(elap){
-   if( !(d3.select('#contcheck')[0][0].checked) ){
-    // t.stop();
-   }
-   else{
-
-    keepsending();
-  }
-}, 200)
+//  console.log('is it still checked', d3.select('#contcheck')[0][0].checked)
+  setTimeout(function(elap){
+    if( !(d3.select('#contcheck')[0][0].checked) ){
+      // t.stop();
+      console.log('stoping the refresh')
+     }
+    else{
+      keepsending();
+    }
+  }, refreshDelay)
 }
 
 
-  function sendToFlaschen(data){
+function sendToFlaschen(data){
     //console.log("Got info from the client it is: " + data);
     var data = data //.split('\n');
     for(d of data){
@@ -243,3 +223,7 @@ setTimeout(function(elap){
     }
     flash.show();
   }
+
+// basic flow of the app
+// set up text input and will load and show inital image
+setupInput();
