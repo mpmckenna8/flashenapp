@@ -200,7 +200,6 @@ function canToFlashen(imgdat){
 function setupInput(){
   var linkinput = d3.select('#linkin');
   linkinput.on('keydown', function(err,d ,e){
-    var linkinput = d3.select('#linkin');
 //    console.log(linkinput[0][0].value)
   })
   //console.log(linkinput.value)
