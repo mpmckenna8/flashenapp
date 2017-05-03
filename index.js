@@ -142,7 +142,6 @@ function canToFlashen(imgdat){
     for(x=0; x < screenWidth; x++){
         var indi = ((xoff) * x * 4 +  (yoff * imageWidth)*y*4 )
 
-      //  console.log(counter, x, y, indi);
         //counter= counter+1;
         pixels[x + y*screenWidth].color = [imgdat.data[indi],
                                       imgdat.data[indi+1], imgdat.data[indi+2]]
@@ -156,11 +155,12 @@ function canToFlashen(imgdat){
 function setupInput(){
   var linkinput = d3.select('#linkin');
   linkinput.on('keydown', function(err,d ,e){
+
     var linkinput = d3.select('#linkin');
-//    console.log(linkinput[0][0].value)
+    console.log('and this val on keydown is, ', this.value)
   })
   //console.log(linkinput.value)
-  linkinput[0][0].value = imgi.src;
+  linkinput.attr('value', imgi.src);
 }
 
 
@@ -170,7 +170,7 @@ d3.select('#urlbut')
     var linkinpu = d3.select('#linkin');
   //  var newlink = linkinpu.attr('value')
     //  console.log('update image with', linkinpu[0][0].value, newlink)
-    imgi.src = linkinpu[0][0].value;
+    imgi.src = document.getElementById('linkin').value;
 
   })
 
