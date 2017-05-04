@@ -18,7 +18,10 @@ label {
   padding-left: 15px;
   text-indent: -15px;
 }
-input {
+
+
+
+input#contcheck {
   width: 13px;
   height: 13px;
   padding: 0;
