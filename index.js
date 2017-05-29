@@ -4,7 +4,7 @@ var Pixel = require('./pixer.js')
 
 var refreshDelay = 500
 
-flash.layer = 15
+flash.layer = 13
 flash.init()
 console.log(flash.hostname)
 
@@ -22,6 +22,36 @@ let svg
 console.log('new try with src, ', src)
 
 var imgi = new Image();  // eslint-disable-line
+
+var layers = [];
+
+for (i = 1; i < 16; i++) {
+  layers.push(i);
+}
+
+console.log(layers)
+d3.select('#layerselect') .on('change', function(d){
+   console.log('it changed, ', this.value)
+   flash.layer = parseInt(this.value);
+   datb.write(flash.headerString(), 0);
+ }).selectAll('option')
+ .data(layers)
+ .enter()
+ .append('option')
+ .attr('value', function(d){
+   console.log('d of val', d)
+   return d
+ })
+ .attr('selected', function(d){
+   if( d === flash.layer ) {
+     return true;
+   }
+   return false
+ })
+ .text( (d)=>d )
+
+
+
 
 // handle when an image is loaded.
 imgi.onload = function () {
@@ -48,6 +78,7 @@ window.addEventListener('keydown', function (e) {
 
 var inputElement = document.getElementById('fileuploader')
 inputElement.addEventListener('change', handleFiles, false)
+
 function handleFiles () {
   var fileList = this.files /* now you can work with the file list */
   console.log(fileList)
@@ -178,7 +209,7 @@ d3.select('#contcheck')
   })
 
 function keepsending () {
-  flashenSvg()
+flash.show() //  flashenSvg()
 //  console.log('is it still checked', d3.select('#contcheck')[0][0].checked)
   setTimeout(function (elap) {
     if (!(document.getElementById('contcheck').checked)) {
@@ -206,6 +237,43 @@ function sendToFlaschen (data) {
   flash.show()
 }
 
+// this part handles users dropping files into the red box
+var dropbox;
+
+dropbox = document.getElementById("filedragspot");
+dropbox.addEventListener("dragenter", dragenter, false);
+dropbox.addEventListener("dragover", dragover, false);
+dropbox.addEventListener("drop", drop, false);
+
+function dragenter(e) {
+  e.stopPropagation();
+  e.preventDefault();
+}
+
+function dragover(e) {
+  e.stopPropagation();
+  e.preventDefault();
+}
+
+function drop(e) {
+  e.stopPropagation();
+  e.preventDefault();
+
+  var dt = e.dataTransfer;
+  var files = dt.files;
+
+  handleFileDrop(files);
+
+}
+
+function handleFileDrop (filers) {
+  var fileList = filers /* now you can work with the file list */
+  console.log(filers)
+  imgi.src = window.URL.createObjectURL(fileList[0])
+}
+
+
 // basic flow of the app
-// set up text input and will load and show inital image
+// set up text input and will load and show inital image and allow all the
+// stuff to work
 setupInput()

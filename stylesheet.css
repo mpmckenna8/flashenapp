@@ -13,6 +13,11 @@ textarea, input {
 //  display:block;
 }
 
+#filedragspot {
+  background-color: red;
+  border: medium dashed green;
+}
+
 label {
   display: block;
   padding-left: 15px;
