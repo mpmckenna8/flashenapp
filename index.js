@@ -493,7 +493,7 @@ setupInput()
       flashenSvg();
 
   		setTimeout(function(){
-  			requestAnimationFrame(renderFrame);
+  			renderFrame()//requestAnimationFrame(renderFrame);
   		}, Math.max(0, Math.floor(frame.delay - diff)));
   	}
     }
@@ -504,7 +504,7 @@ setupInput()
     .on('click', function(d){
       var linkinpu = d3.select('#linkin');
       var newlink = linkinpu.attr('text')
-
+      playing = false
       var linksplit = document.getElementById('linkin').value;
       console.log(linksplit, 'ender = ',  linksplit.split('.')[linksplit.split('.').length-1])
 
@@ -516,7 +516,7 @@ setupInput()
       else{
       //  imgi.src = linkinpu[0][0].value;
         console.log('need to do gif stuff')
-
+    //    playing = true;
         url.value = linksplit;
         loadGIF()
 
