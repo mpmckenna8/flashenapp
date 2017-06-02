@@ -7,8 +7,16 @@
 </head>
 <body>
   <h1>Flashentashen imglink</h1>
-  <input type="text" id="linkin"></input>
-  <button id="urlbut">update picture</button>
+  <div id="flashset">
+    <label>Select layer<select id="layerselect">
+    </select>
+    </label
+  </div>
+  <div id="filedragspot">
+    <input type="text" id="linkin"></input>
+    <button id="urlbut">update picture</button>
+    <input type="file" id="fileuploader" type="image">
+  </div>
 </br>
   <svg id="flashsvg"></svg>
   <div id"canholder">
@@ -24,30 +32,7 @@
   </div>
   <div id='visualization'></div>
   <p>Image from the internet</p>
-  <canvas id="mycanvas" class="visualizer" >
-  </canvas>
-
-  <img id="imgholder"></img>
-
-
-
-  <div>
-  <canvas id="c"></canvas>
-</div>
-<div style="margin: 10px 0;">
-  <input id="url" type="text"/>
-  <button onclick="loadGIF()">Load</button>
-  <button onclick="playpause()">Play/Pause</button>
-</div>
-<div style="margin-bottom: 10px;">
-  <input id="grayscale" type="checkbox" onchange="bEdgeDetect = !bEdgeDetect"> Edge Detect
-  <input id="invert" type="checkbox" onchange="bInvert = !bInvert;"> Invert Colours
-  <input id="grayscale" type="checkbox" onchange="bGrayscale = !bGrayscale"> Grayscale
-</div>
-<div>
-  <input id="pixels" type="range" min="0" max="100" step="1" value="100" oninput="pixelPercent = value;"> Pixelate Amount
-</div>
-
+  <canvas id="mycanvas" class="visualizer" ></canvas>
 
   <script type="text/javascript" src="index.js"></script>
 

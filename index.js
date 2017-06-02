@@ -1,301 +1,296 @@
-var flash = require('flaschenode');
-var d3 = require('d3');
-var pixel = require('./pixer.js');
 
+// new stuff starts here
+var flash = require('flaschenode')
+var d3 = require('d3')
+var Pixel = require('./pixer.js')
+var refreshDelay = 500
 
-flash.layer = 15;
-flash.init();
+flash.layer = 13
+flash.init()
 console.log(flash.hostname)
 
-var datb = Buffer.alloc( flash.headerString().length+ flash.footerString().length + flash.height* flash.width*3)
+var datb = Buffer.alloc(flash.headerString().length + flash.footerString().length + flash.height * flash.width * 3)
 
-flash.data = datb;
+flash.data = datb
 
-datb.write(flash.headerString(), 0);
+datb.write(flash.headerString(), 0)
 var starfoo = datb.length - flash.footerString().length
-datb.write(flash.footerString(), starfoo);
+datb.write(flash.footerString(), starfoo)
 
-var src = "https://static.pexels.com/photos/17767/pexels-photo.jpg";
+var src = 'https://static.pexels.com/photos/17767/pexels-photo.jpg'
+let svg
 
-let svg;
-
-//picture.remove();
 console.log('new try with src, ', src)
-var counter = 0;
 
-var viz = {} //new image('#visualization', null, [src], {hullAlgorithm: 'convex'});
+var imgi = new Image();  // eslint-disable-line
 
-var imgi = new Image();
+var layers = [];
 
-
-imgi.onload = startDraw;
-imgi.src =  'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'//'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
-//console.log(img)
-var dimg;
-
-function startDraw(){
-
-   dimg = d3.select('#imgholder').attr('src', imgi.src)
-
-   paintCanvas();
+for (i = 1; i < 16; i++) {
+  layers.push(i);
 }
 
+console.log(layers)
+d3.select('#layerselect') .on('change', function(d){
+   console.log('it changed, ', this.value)
+   flash.layer = parseInt(this.value);
+   datb.write(flash.headerString(), 0);
+ }).selectAll('option')
+ .data(layers)
+ .enter()
+ .append('option')
+ .attr('value', function(d){
+   console.log('d of val', d)
+   return d
+ })
+ .attr('selected', function(d){
+   if( d === flash.layer ) {
+     return true;
+   }
+   return false
+ })
+ .text( (d)=>d )
 
 
-function paintCanvas(){
-  console.log('img url = ', imgi)
-//  requestAnimationFrame(paintCanvas)
-// url.value need to set to do the figs
-var linksplit = (imgi.src).split('.')
-if((imgi.src).split('.')[linksplit.length-1] !== 'gif'){
 
-  console.log(dimg[0][0])
-  canny.width = imgi.width;
+
+// handle when an image is loaded.
+imgi.onload = function () {
+  canny.width = imgi.width
   canny.height = imgi.height
 
-  //  eightBit(document.getElementById('mycanvas'), img, 114);
-  ct.drawImage(dimg[0][0], 0, 0);
+  ct.drawImage(imgi, 0, 0)
   //  console.log(ct.getImageData(0, 0, img.width, img.height))
-  //  ct.width = 60;
-    //ct.height =60;
-  }
-  else{
-
-    loadGIF();
-    console.log('deal with gif gosh darn')
-  }
-
-  flashenSvg();
-
+  flashenSvg()
 }
 
-var remote = require('electron').remote;
-var fs = require('fs');
+imgi.src = 'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'// 'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
 
+window.addEventListener('keydown', function (e) {
+  console.log('keycode=', e.keyCode)
+  if (e.keyCode === 80) console.log('pressed save thing') // save();
+  else if (e.keyCode === 70) {
+  //  const footer = new Buffer(flash.footerString())
+    console.log('want to make this auto send to the flashentaschen')
+  //  var srcData = src
+  //  var allcon // to hold the final buffer to send
+  }
+})
 
-window.addEventListener('keydown',function(e){
- console.log('keycode=', e.keyCode);
-    if(e.keyCode == 80) console.log('pressed save thing') //save();
-    else if(e.keyCode == 70){
-      const footer = new Buffer(flash.footerString())
-      var srcData = src;
-      var allcon; // to hold the final buffer to send
-    }
-  })
+var inputElement = document.getElementById('fileuploader')
+inputElement.addEventListener('change', handleFiles, false)
 
+function handleFiles () {
+  var fileList = this.files /* now you can work with the file list */
+  console.log(fileList)
+  imgi.src = window.URL.createObjectURL(fileList[0])
+}
 
-var screenWidth;
-var screenHeight;
-var width = 15;
-var height = 15;
-var pixels;
+var screenWidth
+var screenHeight
+var width = 15
+var height = 15
+var pixels
 
-function flashenSvg(){
+function flashenSvg () {
+  svg = d3.select('#flashsvg')
+  screenWidth = 45
+  screenHeight = 35
+  svg.attr('width', width * screenWidth)
+  svg.attr('height', screenHeight * height)
 
-    svg = d3.select('#flashsvg');
-    screenWidth= 45;
-    screenHeight = 35;
-    svg.attr('width',width*screenWidth) ;
-    svg.attr('height', screenHeight*height)
+  svg.style('background-color', 'pink')
 
-    svg.style("background-color", "pink")
+  pixels = []
 
-    pixels = [];
-
-    for(y = 0; y < screenHeight; y++){
-      for(x=0; x < screenWidth; x++){
+  for (let y = 0; y < screenHeight; y++) {
+    for (let x = 0; x < screenWidth; x++) {
       //  console.log(x)
-        pixels.push(new pixel(x,y))
-
-      }
+      pixels.push(new Pixel(x, y))
     }
+  }
 
-    var imgdat = (ct.getImageData(0, 0,
-            imgi.width, imgi.height))
-    canToFlashen(imgdat);
+  var imgdat = ct.getImageData(0, 0, imgi.width, imgi.height)
 
-    drawFlash(pixels)
+  canToFlashen(imgdat)
 
+  drawFlash(pixels)
 }
-
-
-
-setupInput();
 
 var canny = document.getElementById('mycanvas')
 var ct = canny.getContext('2d')
-//console.log(ct.getImageData(0, 0, 200, 200))
+// console.log(ct.getImageData(0, 0, 200, 200))
+function drawFlash (data) {
+  svg.selectAll('rect').remove()
 
-function drawFlash(data){
-
-  svg.selectAll('rect').remove();
-
-    var pixs = svg.selectAll('rect')
+  var pixs = svg.selectAll('rect')
       .data(data)
 
-    pixs.enter().append('rect')
-      .attr('x', function(d){
-      //  console.log(d)
+  pixs.enter().append('rect')
+      .attr('x', function (d) {
     //  console.log(d)
-        return width*d.xin ;
+        return width * d.xin
       })
-      .attr("width", width)
-        .attr("height", height)
-      .attr('y', function(d){
-        return height*d.yin;
+      .attr('width', width)
+        .attr('height', height)
+      .attr('y', function (d) {
+        return height * d.yin
       })
-      .attr('id', function(d){
-        return 'p'+d.xin + '-'+d.yin
+      .attr('id', function (d) {
+        return 'p' + d.xin + '-' + d.yin
       })
-      .attr('d', function(d){
-        return JSON.stringify(d);
+      .attr('d', function (d) {
+        return JSON.stringify(d)
       })
       .attr('stroke', 'blue')
-      .attr('fill', function(d){
+      .attr('fill', function (d) {
       //  console.log(d.color)
-
         return d3.rgb(d.color[0], d.color[1], d.color[2])
       })
-
 }
 
+// my kind of lazy sampling of the canvas
+function canToFlashen (imgdat) {
+  var imageWidth = imgdat.width
+  var imageHeight = imgdat.height
 
-function canToFlashen(imgdat){
+  var xoff = Math.floor(imageWidth / screenWidth)
 
-  var imageWidth = imgdat.width;
-  var imageHeight = imgdat.height;
-
-  var xoff = Math.floor(imageWidth/screenWidth);
-
-  var yoff = Math.floor(imageHeight/screenHeight);
-
-//  console.log(xoff, yoff)
-//  console.log(img.data[130], img.data[144], img.data[1322], img.data[3])
-//for(i of img.data){
-//  console.log(i)
-//
-//}
+  var yoff = Math.floor(imageHeight / screenHeight)
 
 // each x picwel we need to go four through * imageWidth/screenHeight
-  for(y = 0; y < screenHeight; y++){
-    for(x=0; x < screenWidth; x++){
-        var indi = ((xoff) * x * 4 +  (yoff * imageWidth)*y*4 )
+  for (let y = 0; y < screenHeight; y++) {
+    for (let x = 0; x < screenWidth; x++) {
+      var indi = ((xoff) * x * 4 + (yoff * imageWidth) * y * 4)
 
-      //  console.log(counter, x, y, indi);
-        //counter= counter+1;
-        pixels[x + y*screenWidth].color = [imgdat.data[indi], imgdat.data[indi+1], imgdat.data[indi+2]]
+        // counter= counter+1;
+      pixels[x + y * screenWidth].color = [imgdat.data[indi],
+        imgdat.data[indi + 1], imgdat.data[indi + 2]]
     }
   }
   sendToFlaschen(pixels)
 }
 
-
-
-
-function setupInput(){
-  var linkinput = d3.select('#linkin');
-  linkinput.on('keydown', function(err,d ,e){
-    var linkinput = d3.select('#linkin');
-//    console.log(linkinput[0][0].value)
+function setupInput () {
+  var linkinput = d3.select('#linkin')
+  linkinput.on('keydown', function (err, d, e) {
+  //  var linkinput = d3.select('#linkin');
+    if (err) {
+      console.log('somehow there was an error on keydown it is, ', err)
+    }
+    console.log('and d on keydown is, ', d)
   })
-  //console.log(linkinput.value)
-  linkinput[0][0].value = imgi.src;
+  // console.log(linkinput.value)
+  linkinput.attr('value', imgi.src)
 }
 
 
-d3.select('#urlbut')
-  .on('click', function(d){
-    var linkinpu = d3.select('#linkin');
-    var newlink = linkinpu.attr('text')
 
-    var linksplit = (linkinpu[0][0].value).split('.')
-    console.log('update image with', (linkinpu[0][0].value).split('.')[linksplit.length -1])
-    if( linksplit[linksplit.length-1] !== 'gif'){
-      imgi.src = linkinpu[0][0].value;
-    }
-    else{
-    //  imgi.src = linkinpu[0][0].value;
-
-      url.value = linkinpu[0][0].value
-
-      console.log('need to do gif stuff')
-      //c = canny;
-    }
-
-  })
-
-
+// Handle click on the button to update the flashentaschen
 d3.select('#updateBut')
-  .on('click', function(d){
-
+  .on('click', function (d) {
     sendToFlaschen(pixels)
-
   })
 
-
+// When the check box if checkeud handle refreshing the flashentaschen or not
 d3.select('#contcheck')
-  .on('change', function(d, i){
+  .on('change', function (d, i) {
     console.log('checkedout', d, this.checked)
-    flashenSvg();
+    flashenSvg()
 
-    if( this.checked ){
-      keepsending();
-
-     }
-
+    if (this.checked) {
+      keepsending()
+    }
   })
-var t;
-function keepsending() {
 
-  flashenSvg();
-  console.log('is it still checked', d3.select('#contcheck')[0][0].checked)
-
-setTimeout(function(elap){
-   if( !(d3.select('#contcheck')[0][0].checked) ){
-    // t.stop();
-   }
-   else{
-
-    keepsending();
-  }
-}, 200)
+function keepsending () {
+flash.show() //  flashenSvg()
+//  console.log('is it still checked', d3.select('#contcheck')[0][0].checked)
+  setTimeout(function (elap) {
+    if (!(document.getElementById('contcheck').checked)) {
+      // t.stop();
+      console.log('stoping the refresh')
+    } else {
+      keepsending()
+    }
+  }, refreshDelay)
 }
 
-
-  function sendToFlaschen(data){
-    //console.log("Got info from the client it is: " + data);
-    var data = data //.split('\n');
-    for(d of data){
-      try{
+function sendToFlaschen(data) {
+    // console.log("Got info from the client it is: " + data);
+  var datum = data // .split('\n');
+  for (let d of datum) {
+    try {
       //  var djson = JSON.parse(d);
       //  console.log(djson.xin, djson.yin )
-        var color = d.color;
-        flash.set(d.xin, d.yin, color);
-      }
-      catch(e){
-        console.log(e)
-      }
+      var color = d.color
+      flash.set(d.xin, d.yin, color)
+    } catch (e) {
+      console.log(e)
     }
-    flash.show();
   }
+  flash.show()
+}
 
+// this part handles users dropping files into the red box
+var dropbox;
+
+dropbox = document.getElementById("filedragspot");
+dropbox.addEventListener("dragenter", dragenter, false);
+dropbox.addEventListener("dragover", dragover, false);
+dropbox.addEventListener("drop", drop, false);
+
+function dragenter(e) {
+  e.stopPropagation();
+  e.preventDefault();
+}
+
+function dragover(e) {
+  e.stopPropagation();
+  e.preventDefault();
+}
+
+function drop(e) {
+  e.stopPropagation();
+  e.preventDefault();
+
+  var dt = e.dataTransfer;
+  var files = dt.files;
+
+  handleFileDrop(files);
+
+}
+
+function handleFileDropl(filers) {
+  var fileList = filers /* now you can work with the file list */
+  console.log(filers)
+  imgi.src = window.URL.createObjectURL(fileList[0])
+}
+
+
+// basic flow of the app
+// set up text input and will load and show inital image and allow all the
+// stuff to work
+setupInput()
+
+// new stuff ends here
 
   // user canvas
   var c = document.getElementById( 'mycanvas')//'c');
   var ctx = c.getContext('2d');
   // gif patch canvas
-  var tempCanvas = document.createElement('canvas');
-  var tempCtx = tempCanvas.getContext('2d');
-  // full gif canvas
+
   var gifCanvas = document.createElement('canvas');
   var gifCtx = gifCanvas.getContext('2d');
+  var tempCanvas = document.createElement('canvas');
+  var tempCtx = tempCanvas.getContext('2d')
 
-  var url = document.getElementById('url');
+  var url = document.getElementById('linkin');
   // default gif
-  url.value ='https://media2.giphy.com/media/l3vQX02uGK1Y0R4Zi/giphy.gif';
+  //url.value ='https://media2.giphy.com/media/l3vQX02uGK1Y0R4Zi/giphy.gif';
 
   // load the default gif
-  loadGIF();
+//  loadGIF();
   var gif;
 
   // load a gif with the current input url value
@@ -349,6 +344,7 @@ setTimeout(function(elap){
     	if(!playing){
     		playpause();
     	}
+
   //  }
   }
 
@@ -494,10 +490,37 @@ setTimeout(function(elap){
 
   	if(playing){
   		// delay the next gif frame
+      flashenSvg();
+
   		setTimeout(function(){
   			requestAnimationFrame(renderFrame);
-  			//renderFrame();
   		}, Math.max(0, Math.floor(frame.delay - diff)));
   	}
     }
   }
+
+
+  d3.select('#urlbut')
+    .on('click', function(d){
+      var linkinpu = d3.select('#linkin');
+      var newlink = linkinpu.attr('text')
+
+      var linksplit = document.getElementById('linkin').value;
+      console.log(linksplit, 'ender = ',  linksplit.split('.')[linksplit.split('.').length-1])
+
+    //  console.log('update image with', (linkinpu[0][0].value).split('.')[linksplit.length -1])
+      if( linksplit.split('.')[linksplit.split('.').length -1] !== 'gif'){
+        console.log('thinks its not a gif')
+        imgi.src = linksplit;
+      }
+      else{
+      //  imgi.src = linkinpu[0][0].value;
+        console.log('need to do gif stuff')
+
+        url.value = linksplit;
+        loadGIF()
+
+        //c = canny;
+      }
+
+    })

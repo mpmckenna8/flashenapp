@@ -13,12 +13,20 @@ textarea, input {
 //  display:block;
 }
 
+#filedragspot {
+  background-color: red;
+  border: medium dashed green;
+}
+
 label {
   display: block;
   padding-left: 15px;
   text-indent: -15px;
 }
-input {
+
+
+
+input#contcheck {
   width: 13px;
   height: 13px;
   padding: 0;
