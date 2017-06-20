@@ -28,7 +28,6 @@ var layers = [];
 
 
 var src = 'https://static.pexels.com/photos/17767/pexels-photo.jpg'
-let svg
 
 console.log('new try with src, ', src)
 
