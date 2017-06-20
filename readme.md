@@ -29,3 +29,12 @@ More UI stuff and maybe a help screen. Maybe just a link to a .md document with 
 
 
 Some media on here showing what you can do.
+
+
+I'll try and add them all to the package.json so it's easier.
+
+
+To make a build for a specific system do like:
+
+    electron-packager ./ --platform=linux --overwrite
+>>>>>>> Updated the readme a very little to show a build command for linux.
