@@ -1,7 +1,4 @@
-<<<<<<< 72cc35808c146ce71a0beb0b45c1ce6bbeb31902
-=======
 
->>>>>>> Works with gifs but takes quite a while to get going with them. Also only handles gif links, doesn't know what to do with gif files yet so it will still just show the first frame.
 // new stuff starts here
 var flash = require('flaschenode')
 var d3 = require('d3')
@@ -19,9 +16,7 @@ flash.data = datb
 datb.write(flash.headerString(), 0)
 var starfoo = datb.length - flash.footerString().length
 datb.write(flash.footerString(), starfoo)
-<<<<<<< 72cc35808c146ce71a0beb0b45c1ce6bbeb31902
 
-<<<<<<< 85bef9da5e61181d163b9e9cf55d299ab4afa2ca
 var src = 'https://static.pexels.com/photos/17767/pexels-photo.jpg'
 let svg
 
