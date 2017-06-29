@@ -4,6 +4,8 @@ var d3 = require('d3');
 var image = require('lightning-image-poly');
 var pixel = require('./pixer.js');
 
+let sampleCanvas = require('./helpers/samplecanvas.js')
+
 
 //console.log(pixel.toString());
 flash.layer = 15;
@@ -50,24 +52,22 @@ imgi.onload = function () {
   //  canToFlashen(ct.getImageData(0, 0, img.width, img.height));
 };
 
-imgi.src =  'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'//'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
+imgi.src =  'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'
+//'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
 //console.log(img)
 
 
-var remote = require('electron').remote;
 var fs = require('fs');
 
 
 function save(){
     remote.getCurrentWindow().webContents.printToPDF(
       {
-      portrait:true
+        portrait:true
       },
       function(err, data){
-    //    fs.writeFile('annotation.pdf', data, function(err){
         if (err){ alert('error generating pdf! ' + err.msg)}
         else console.log('pressed f')//alert('pdf saved! check out your cat');
-    //  })
   })
 }
 
@@ -81,9 +81,7 @@ window.addEventListener('keydown',function(e){
       const footer = new Buffer(flash.footerString())
 
       var srcData = src;
-      var allcon; // to hold the final buffer to send
-
-    }
+      }
   })
 
 
@@ -117,6 +115,7 @@ function flashenSvg(){
 
     var imgdat = (ct.getImageData(0, 0,
             imgi.width, imgi.height))
+
     canToFlashen(imgdat);
 
     drawFlash(pixels)
@@ -130,6 +129,7 @@ setupInput();
 var canny = document.getElementById('mycanvas')
 var ct = canny.getContext('2d')
 //console.log(ct.getImageData(0, 0, 200, 200))
+
 
 function drawFlash(data){
 
@@ -158,7 +158,6 @@ function drawFlash(data){
       .attr('stroke', 'blue')
       .attr('fill', function(d){
       //  console.log(d.color)
-
         return d3.rgb(d.color[0], d.color[1], d.color[2])
       })
 
@@ -166,7 +165,8 @@ function drawFlash(data){
 
 
 function canToFlashen(imgdat){
-
+  sampleCanvas(imgdat, screenWidth, screenHeight, pixels);
+  /*
   var imageWidth = imgdat.width;
   var imageHeight = imgdat.height;
 
@@ -185,12 +185,12 @@ function canToFlashen(imgdat){
   for(y = 0; y < screenHeight; y++){
     for(x=0; x < screenWidth; x++){
         var indi = ((xoff) * x * 4 +  (yoff * imageWidth)*y*4 )
-
       //  console.log(counter, x, y, indi);
         //counter= counter+1;
         pixels[x + y*screenWidth].color = [imgdat.data[indi], imgdat.data[indi+1], imgdat.data[indi+2]]
     }
   }
+  */
   sendToFlaschen(pixels)
 }
 
@@ -234,6 +234,7 @@ d3.select('#contcheck')
      }
   })
 var t;
+
 function keepsending() {
 
   flashenSvg();
@@ -251,7 +252,7 @@ function keepsending() {
 
 
   function sendToFlaschen(data){
-    //console.log("Got info from the client it is: " + data);
+    console.log("Got info from the client it is: " + data);
     var data = data //.split('\n');
     for(d of data){
       try{
@@ -289,8 +290,9 @@ function keepsending() {
         },
 
         // Success callback
-        function(stream) {
-           source = audioCtx.createMediaStreamSource(stream);
+    function(stream) {
+
+      source = audioCtx.createMediaStreamSource(stream);
           // source.connect(analyser);
        //    analyser.connect(distortion);
        //    distortion.connect(biquadFilter);
@@ -301,65 +303,51 @@ function keepsending() {
         //	 visualize();
           // voiceChange();
 
-  	var analyser = audioCtx.createAnalyser();
-  	analyser.minDecibels = -90;
-  analyser.maxDecibels = -10;
-  analyser.smoothingTimeConstant = 0.85;
+      var analyser = audioCtx.createAnalyser();
+      analyser.minDecibels = -90;
+      analyser.maxDecibels = -10;
+      analyser.smoothingTimeConstant = 0.85;
 
-  canvas.setAttribute('width',intendedWidth);
+      canvas.setAttribute('width',intendedWidth);
+      source.connect(analyser);
 
+      analyser.fftSize = 2048;
+      var bufferLength = analyser.frequencyBinCount;
+      var dataArray = new Uint8Array(bufferLength);
 
-  source.connect(analyser);
-  //analyser.connect(distortion);
-  // etc.
-
-  analyser.fftSize = 2048;
-  var bufferLength = analyser.frequencyBinCount;
-  var dataArray = new Uint8Array(bufferLength);
-
-  analyser.getByteTimeDomainData(dataArray);
+      analyser.getByteTimeDomainData(dataArray);
+      canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
 
 
+    function draw() {
+    	drawVisual = requestAnimationFrame(draw);
+      analyser.getByteTimeDomainData(dataArray);
+      canvasCtx.fillStyle = 'rgb(0, 200, 200)';
+      canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+    	canvasCtx.lineWidth = 6;
+      canvasCtx.strokeStyle = 'rgb(255, 0, 0)';
+      canvasCtx.beginPath();
 
-  canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+      var sliceWidth = WIDTH * 1.0 / bufferLength;
+      var x = 0;
 
-
-  function draw() {
-  	drawVisual = requestAnimationFrame(draw);
-    analyser.getByteTimeDomainData(dataArray);
-
-    canvasCtx.fillStyle = 'rgb(0, 200, 200)';
-        canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
-  	canvasCtx.lineWidth = 6;
-        canvasCtx.strokeStyle = 'rgb(255, 0, 0)';
-
-        canvasCtx.beginPath();
-
-  var sliceWidth = WIDTH * 1.0 / bufferLength;
-        var x = 0;
-
-        for(var i = 0; i < bufferLength; i++) {
-
+      for(var i = 0; i < bufferLength; i++) {
           var v = dataArray[i] / 128.0;
           var y = v * HEIGHT/2;
-
           if(i === 0) {
-            canvasCtx.moveTo(x, y);
-          } else {
-            canvasCtx.lineTo(x, y);
-          }
-
-          x += sliceWidth;
+              canvasCtx.moveTo(x, y);
+            } else {
+              canvasCtx.lineTo(x, y);
+            }
+            x += sliceWidth;
         }
         canvasCtx.lineTo(canvas.width, canvas.height/2);
         canvasCtx.stroke();
 
+    }
 
-
-  }
   draw();
-        },
-
+  },
         // Error callback
         function(err) {
            console.log('The following gUM error occured: ' + err);
