@@ -203,7 +203,7 @@ function setupInput(){
 //    console.log(linkinput[0][0].value)
   })
   //console.log(linkinput.value)
-  linkinput[0][0].value = imgi.src;
+  linkinput.value = imgi.src;
 }
 
 
@@ -211,8 +211,8 @@ d3.select('#urlbut')
   .on('click', function(d){
     var linkinpu = d3.select('#linkin');
     var newlink = linkinpu.attr('text')
-    console.log('update image with', linkinpu[0][0].value)
-    imgi.src = linkinpu[0][0].value;
+  //  console.log('update image with', linkinpu[0][0].value)
+    imgi.src = linkinpu.value;
 
   })
 
@@ -228,25 +228,22 @@ d3.select('#contcheck')
   .on('change', function(d, i){
     console.log('checkedout', d, this.checked)
     flashenSvg();
-
     if( this.checked ){
       keepsending();
 
      }
-
   })
 var t;
 function keepsending() {
 
   flashenSvg();
-  console.log('is it still checked', d3.select('#contcheck')[0][0].checked)
+  console.log('is it still checked', document.querySelector('#contcheck').checked)
 
-setTimeout(function(elap){
-   if( !(d3.select('#contcheck')[0][0].checked) ){
+  setTimeout(function(elap){
+   if( !(document.querySelector('#contcheck').checked) ){
     // t.stop();
    }
    else{
-
     keepsending();
   }
 }, 200)
@@ -329,9 +326,9 @@ setTimeout(function(elap){
 
   function draw() {
   	drawVisual = requestAnimationFrame(draw);
-  analyser.getByteTimeDomainData(dataArray);
+    analyser.getByteTimeDomainData(dataArray);
 
-  canvasCtx.fillStyle = 'rgb(0, 200, 200)';
+    canvasCtx.fillStyle = 'rgb(0, 200, 200)';
         canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
   	canvasCtx.lineWidth = 6;
         canvasCtx.strokeStyle = 'rgb(255, 0, 0)';
