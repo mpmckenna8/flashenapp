@@ -65,7 +65,7 @@ imgi.onload = function () {
   ct.drawImage(imgi, 0, 0)
   //  console.log(ct.getImageData(0, 0, img.width, img.height))
 
-  flashenSvg();
+  flashenSvg(imgi.width, imgi.height);
 }
 
 imgi.src = 'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'// 'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
@@ -97,6 +97,11 @@ var width = 15
 var height = 15
 var pixels
 
+
+var canny = document.getElementById('mycanvas')
+var ct = canny.getContext('2d')
+
+
 setUpSvg();
 
 function setUpSvg() {
@@ -117,10 +122,9 @@ function setUpSvg() {
   }
 }
 
-function flashenSvg () {
+function flashenSvg (pxwidth, pxheight) {
 
-
-  var imgdat = ct.getImageData(0, 0, imgi.width, imgi.height)
+  var imgdat = ct.getImageData(0, 0, pxwidth, pxheight)
 
   canToFlashen(imgdat)
 
@@ -128,8 +132,6 @@ function flashenSvg () {
 
 }
 
-var canny = document.getElementById('mycanvas')
-var ct = canny.getContext('2d')
 // console.log(ct.getImageData(0, 0, 200, 200))
 function drawFlash (data) {
   svg.selectAll('rect').remove()
@@ -203,18 +205,18 @@ d3.select('#updateBut')
     sendToFlaschen(pixels)
   })
 
-// When the check box if checkeud handle refreshing the flashentaschen or not
+// When the check box if checked handle refreshing the flashentaschen or not
 d3.select('#contcheck')
   .on('change', function (d, i) {
     console.log('checkedout', d, this.checked)
-    flashenSvg()
+    flashenSvg(imgi.width, imgi.height)
     if (this.checked) {
       keepsending()
     }
   })
 
 function keepsending () {
-  flash.show() //  flashenSvg()
+  flash.show();
   //  console.log('is it still checked', d3.select('#contcheck')[0][0].checked)
   setTimeout(function (elap) {
     if (!(document.getElementById('contcheck').checked)) {
@@ -501,7 +503,7 @@ setupInput()
 
     	if(playing){
     		// delay the next gif frame
-        flashenSvg();
+        flashenSvg(c.width, c.height);
 
     //    canToFlashen();
     		setTimeout(function(){
