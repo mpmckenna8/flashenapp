@@ -7,7 +7,6 @@ var refreshDelay = 500
 
 flash.layer = 13
 flash.init()
-console.log(flash.hostname)
 
 var datb = Buffer.alloc(flash.headerString().length + flash.footerString().length + flash.height * flash.width * 3)
 
@@ -26,12 +25,9 @@ var imgi = new Image();  // eslint-disable-line
 
 var layers = [];
 
-
 var src = 'https://static.pexels.com/photos/17767/pexels-photo.jpg'
 
 console.log('new try with src, ', src)
-
-var imgi = new Image();  // eslint-disable-line
 
 var layers = [];
 
@@ -94,16 +90,18 @@ function handleFiles () {
   imgi.src = window.URL.createObjectURL(fileList[0])
 }
 
-var screenWidth
-var screenHeight
+var screenWidth= 45
+var screenHeight  = 35
+
 var width = 15
 var height = 15
 var pixels
 
-function flashenSvg () {
+setUpSvg();
+
+function setUpSvg() {
   svg = d3.select('#flashsvg')
-  screenWidth = 45
-  screenHeight = 35
+
   svg.attr('width', width * screenWidth)
   svg.attr('height', screenHeight * height)
 
@@ -117,12 +115,17 @@ function flashenSvg () {
       pixels.push(new Pixel(x, y))
     }
   }
+}
+
+function flashenSvg () {
+
 
   var imgdat = ct.getImageData(0, 0, imgi.width, imgi.height)
 
   canToFlashen(imgdat)
 
   drawFlash(pixels)
+
 }
 
 var canny = document.getElementById('mycanvas')
@@ -211,8 +214,8 @@ d3.select('#contcheck')
   })
 
 function keepsending () {
-flash.show() //  flashenSvg()
-//  console.log('is it still checked', d3.select('#contcheck')[0][0].checked)
+  flash.show() //  flashenSvg()
+  //  console.log('is it still checked', d3.select('#contcheck')[0][0].checked)
   setTimeout(function (elap) {
     if (!(document.getElementById('contcheck').checked)) {
       // t.stop();
@@ -283,7 +286,7 @@ setupInput()
 // new stuff ends here
 
   // user canvas
-  var c = document.getElementById( 'mycanvas')//'c');
+  var c = document.getElementById( 'mycanvas')
   var ctx = c.getContext('2d');
   // gif patch canvas
 
@@ -294,7 +297,6 @@ setupInput()
 
   var url = document.getElementById('linkin');
   // default gif
-  //url.value ='https://media2.giphy.com/media/l3vQX02uGK1Y0R4Zi/giphy.gif';
 
   // load the default gif
 //  loadGIF();
@@ -312,8 +314,8 @@ setupInput()
   	    if (arrayBuffer) {
   	        gif = new GIF(arrayBuffer);
   	        var frames = gif.decompressFrames(true);
-  	        console.log(gif);
-            console.log('frames = ', frames)
+  	       // console.log(gif);
+            //console.log('frames = ', frames)
   	        // render the gif
   	        renderGIF(frames);
   	    }
@@ -338,10 +340,13 @@ setupInput()
   }
 
   function renderGIF(frames){
-  	loadedFrames = frames;
+
+  	 loadedFrames = frames;
   //  console.log('frames = ', frames)
-  	frameIndex = 0;
+  	   frameIndex = 0;
   //  if(frames.dims){
+    console.log('framcs width supposedly,', frames[0].dims.width)
+
     	c.width = frames[0].dims.width;
     	c.height = frames[0].dims.height;
 
@@ -359,21 +364,22 @@ setupInput()
 
   function drawPatch(frame){
     if(frame ){
-  	var dims = frame.dims;
+    	var dims = frame.dims;
 
-  	if(!frameImageData || dims.width != frameImageData.width || dims.height != frameImageData.height){
-  		tempCanvas.width = dims.width;
-  		tempCanvas.height = dims.height;
-  		frameImageData = tempCtx.createImageData(dims.width, dims.height);
-  	}
+    	if(!frameImageData || dims.width != frameImageData.width || dims.height != frameImageData.height){
+    		tempCanvas.width = dims.width;
+    		tempCanvas.height = dims.height;
+    		frameImageData = tempCtx.createImageData(dims.width, dims.height);
+    	}
 
-  	// set the patch data as an override
-  	frameImageData.data.set(frame.patch);
+    	// set the patch data as an override
+    	frameImageData.data.set(frame.patch);
 
-  	// draw the patch back over the canvas
-  	tempCtx.putImageData(frameImageData, 0, 0);
+    	// draw the patch back over the canvas
+    	tempCtx.putImageData(frameImageData, 0, 0);
 
-  	gifCtx.drawImage(tempCanvas, dims.left, dims.top);
+    	gifCtx.drawImage(tempCanvas, dims.left, dims.top);
+
     }
   }
 
@@ -467,16 +473,15 @@ setupInput()
   	ctx.putImageData(imageData, 0, 0);
   	ctx.drawImage(c, 0, 0, c.width, c.height, 0, 0, pixelsX, pixelsY);
   	ctx.drawImage(c, 0, 0, pixelsX, pixelsY, 0, 0, c.width, c.height);
+
   }
 
   function renderFrame(){
   	// get the frame
   	var frame = loadedFrames[frameIndex];
-
   	var start = new Date().getTime();
 
   	gifCtx.clearRect(0, 0, c.width, c.height);
-
   	// draw the patch
   	drawPatch(frame);
 
@@ -486,25 +491,26 @@ setupInput()
   	// update the frame index
     if( loadedFrames.length ){
 
+    	frameIndex++;
+    	if(frameIndex >= loadedFrames.length){
+    		frameIndex = 0;
+    	}
 
-  	frameIndex++;
-  	if(frameIndex >= loadedFrames.length){
-  		frameIndex = 0;
-  	}
+    	var end = new Date().getTime();
+    	var diff = end - start;
 
-  	var end = new Date().getTime();
-  	var diff = end - start;
+    	if(playing){
+    		// delay the next gif frame
+        flashenSvg();
 
-  	if(playing){
-  		// delay the next gif frame
-      flashenSvg();
-
-  		setTimeout(function(){
-  			renderFrame()//requestAnimationFrame(renderFrame);
-  		}, Math.max(0, Math.floor(frame.delay - diff)));
-  	}
+    //    canToFlashen();
+    		setTimeout(function(){
+    			renderFrame()//requestAnimationFrame(renderFrame);
+    		}, Math.max(0, Math.floor(frame.delay - diff)));
+    	}
     }
   }
+
 
 
   d3.select('#urlbut')
