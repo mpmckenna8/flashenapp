@@ -5,23 +5,24 @@
 </head>
 <body>
   <h1>Flashentashen sound shower</h1>
-  <input type="text" id="linkin"></input>
-  <button id="urlbut">update picture</button>
   </br>
+  <form>
+    <div>
+      <label for="contcheck">
+        <input type="checkbox" id="contcheck" name="contUp" value="continue">
+        Continuously update
+      </label>
+</div>
+</form>
+
+
   <svg id="flashsvg"></svg>
   <div id"canholder">
     <button id="updateBut">Update flashentaschen</button>
-    <form>
-      <div>
-        <label for="contcheck">
-          <input type="checkbox" id="contcheck" name="contUp" value="false">
-          Continuously update
-        </label>
-  </div>
-</form>
+
   </div>
   <div id='visualization'></div>
-  <p>Image from the internet</p>
+  <p>Canvas being sampled</p>
   <canvas id="mycanvas" class="visualizer" width="450px" height="350px">
   </canvas>
 

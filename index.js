@@ -252,7 +252,7 @@ function keepsending() {
 
 
   function sendToFlaschen(data){
-    console.log("Got info from the client it is: " + data);
+  //  console.log("Got info from the client it is: " + data);
     var data = data //.split('\n');
     for(d of data){
       try{
@@ -317,23 +317,27 @@ function keepsending() {
 
       analyser.getByteTimeDomainData(dataArray);
       canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
-
+console.log(dataArray)
 
     function draw() {
     	drawVisual = requestAnimationFrame(draw);
       analyser.getByteTimeDomainData(dataArray);
-      canvasCtx.fillStyle = 'rgb(0, 200, 200)';
+      // the background-color for the canvas set to black/transparent
+      canvasCtx.fillStyle = 'rgb(0, 00, 00)';
       canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
-    	canvasCtx.lineWidth = 6;
+    	canvasCtx.lineWidth = 8;
       canvasCtx.strokeStyle = 'rgb(255, 0, 0)';
       canvasCtx.beginPath();
 
-      var sliceWidth = WIDTH * 1.0 / bufferLength;
+      var sliceWidth = WIDTH  / bufferLength;
       var x = 0;
 
       for(var i = 0; i < bufferLength; i++) {
-          var v = dataArray[i] / 128.0;
-          var y = v * HEIGHT/2;
+          // the default mid value in the dataArray is 128 so v returns like a 1.0
+          // for nothing and oscillates around that
+          var v = (dataArray[i]) / 128.0;
+          var myv = (dataArray[i] + (dataArray[i]-128.0) *3.0) / 128.0
+          var y = myv * HEIGHT/2.0;
           if(i === 0) {
               canvasCtx.moveTo(x, y);
             } else {
@@ -350,7 +354,7 @@ function keepsending() {
   },
         // Error callback
         function(err) {
-           console.log('The following gUM error occured: ' + err);
+           console.log('The following UM error occured: ' + err);
         }
      );
   } else {
