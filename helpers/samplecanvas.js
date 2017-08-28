@@ -1,5 +1,6 @@
 
-// Samples canvas imagedata
+// Samples canvas imagedata and fills in all the pixels with colors based on
+// really simple
 function sampleCanvas(imgdat, screenWidth, screenHeight, pixels) {
   let grid = [];
   //console.log(pixels)

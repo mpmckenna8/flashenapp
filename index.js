@@ -40,8 +40,9 @@ var viz = {} //new image('#visualization', null, [src], {hullAlgorithm: 'convex'
 var imgi = new Image();
 
 imgi.onload = function () {
-  canny.width = imgi.width;
-  canny.height = imgi.height
+//  canny.width = imgi.width;
+//  canny.height = imgi.height
+
 
   //  eightBit(document.getElementById('mycanvas'), img, 114);
   ct.drawImage(imgi, 0, 0);
@@ -85,8 +86,6 @@ window.addEventListener('keydown',function(e){
   })
 
 
-
-
 var screenWidth;
 var screenHeight;
 var width = 15;
@@ -113,8 +112,9 @@ function flashenSvg(){
       }
     }
 
+
     var imgdat = (ct.getImageData(0, 0,
-            imgi.width, imgi.height))
+            canny.width, canny.height))
 
     canToFlashen(imgdat);
 
@@ -233,6 +233,8 @@ d3.select('#contcheck')
 
      }
   })
+
+
 var t;
 
 function keepsending() {
@@ -240,14 +242,14 @@ function keepsending() {
   flashenSvg();
   console.log('is it still checked', document.querySelector('#contcheck').checked)
 
-  setTimeout(function(elap){
+  setTimeout(function(){
    if( !(document.querySelector('#contcheck').checked) ){
     // t.stop();
    }
    else{
     keepsending();
   }
-}, 200)
+}, 50)
 }
 
 
@@ -262,7 +264,7 @@ function keepsending() {
         flash.set(d.xin, d.yin, color);
       }
       catch(e){
-        console.log(e)
+    //    console.log(e)
       }
     }
     flash.show();
@@ -274,7 +276,7 @@ function keepsending() {
   var canvas = document.querySelector('#mycanvas');
   var canvasCtx = canvas.getContext("2d");
   var  WIDTH = canvas.width;
-   var HEIGHT = canvas.height;
+  var HEIGHT = canvas.height;
   var intendedWidth = document.querySelector('.visualizer').clientWidth;
   console.log(intendedWidth)
 
@@ -288,8 +290,7 @@ function keepsending() {
         {
            audio: true
         },
-
-        // Success callback
+        // Success callback so mediadata was got
     function(stream) {
 
       source = audioCtx.createMediaStreamSource(stream);
@@ -317,7 +318,7 @@ function keepsending() {
 
       analyser.getByteTimeDomainData(dataArray);
       canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
-console.log(dataArray)
+//console.log(dataArray)
 
     function draw() {
     	drawVisual = requestAnimationFrame(draw);
@@ -336,8 +337,8 @@ console.log(dataArray)
           // the default mid value in the dataArray is 128 so v returns like a 1.0
           // for nothing and oscillates around that
           var v = (dataArray[i]) / 128.0;
-          var myv = (dataArray[i] + (dataArray[i]-128.0) *3.0) / 128.0
-          var y = myv * HEIGHT/2.0;
+      //    var myv = (dataArray[i] + (dataArray[i]-128.0) *5.0) / 128.0
+          var y = v * HEIGHT/2.0;
           if(i === 0) {
               canvasCtx.moveTo(x, y);
             } else {
@@ -345,7 +346,7 @@ console.log(dataArray)
             }
             x += sliceWidth;
         }
-        canvasCtx.lineTo(canvas.width, canvas.height/2);
+        canvasCtx.lineTo(WIDTH, HEIGHT/2);
         canvasCtx.stroke();
 
     }
@@ -354,9 +355,10 @@ console.log(dataArray)
   },
         // Error callback
         function(err) {
-           console.log('The following UM error occured: ' + err);
+           console.log('The following UM error occured trying to get user media: ' + err);
         }
      );
   } else {
      console.log('getUserMedia not supported on your browser!');
+
   }
