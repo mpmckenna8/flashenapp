@@ -5,73 +5,26 @@ var d3 = require('d3')
 var Pixel = require('./pixer.js')
 var refreshDelay = 500
 
-flash.layer = 13
-flash.init()
+var screenWidth= 45
+var screenHeight  = 35
 
-var datb = Buffer.alloc(flash.headerString().length + flash.footerString().length + flash.height * flash.width * 3)
+let drawing = false;
 
-flash.data = datb
+let svg = d3.select('#flashsvg')
 
-datb.write(flash.headerString(), 0)
-var starfoo = datb.length - flash.footerString().length
-datb.write(flash.footerString(), starfoo)
+//var imgi = new Image();  // eslint-disable-line
+setUpFlaschen(flash)
+set_up_layer_select(flash)
 
-var src = 'https://static.pexels.com/photos/17767/pexels-photo.jpg'
-let svg
+var pixels = setUpSvg(screenWidth, screenHeight);
 
-console.log('new try with src, ', src)
+console.log('pixels after setup', pixels)
 
-var imgi = new Image();  // eslint-disable-line
+sendToFlaschen(pixels)
 
-var layers = [];
-
-var src = 'https://static.pexels.com/photos/17767/pexels-photo.jpg'
-
-console.log('new try with src, ', src)
-
-var layers = [];
-
-for (i = 1; i < 16; i++) {
-  layers.push(i);
-}
-
-console.log(layers)
-d3.select('#layerselect') .on('change', function(d){
-   console.log('it changed, ', this.value)
-   flash.layer = parseInt(this.value);
-   datb.write(flash.headerString(), 0);
- }).selectAll('option')
- .data(layers)
- .enter()
- .append('option')
- .attr('value', function(d){
-   console.log('d of val', d)
-   return d
- })
- .attr('selected', function(d){
-   if( d === flash.layer ) {
-     return true;
-   }
-   return false
- })
- .text( (d)=>d )
-
-
-// handle when an image is loaded.
-imgi.onload = function () {
-  canny.width = imgi.width
-  canny.height = imgi.height
-
-  ct.drawImage(imgi, 0, 0)
-  //  console.log(ct.getImageData(0, 0, img.width, img.height))
-
-  flashenSvg(imgi.width, imgi.height);
-}
-
-imgi.src = 'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'// 'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
 
 window.addEventListener('keydown', function (e) {
-  console.log('keycode=', e.keyCode)
+  console.log('keydown with keycode= ', e.keyCode)
   if (e.keyCode === 80) console.log('pressed save thing') // save();
   else if (e.keyCode === 70) {
   //  const footer = new Buffer(flash.footerString())
@@ -81,56 +34,39 @@ window.addEventListener('keydown', function (e) {
   }
 })
 
-var inputElement = document.getElementById('fileuploader')
-inputElement.addEventListener('change', handleFiles, false)
 
-function handleFiles () {
-  var fileList = this.files /* now you can work with the file list */
-  console.log(fileList)
-  imgi.src = window.URL.createObjectURL(fileList[0])
-}
+enableDraw();
 
-var screenWidth= 45
-var screenHeight  = 35
-
-var width = 15
-var height = 15
-var pixels
+function enableDraw() {
 
 
-var canny = document.getElementById('mycanvas')
-var ct = canny.getContext('2d')
+  d3.selectAll('rect')
+    .on('mousedown', (d) => {
 
+      console.log('start drawing', d)
+      drawing = true;
+    })
+    .on('mouseup', (d) => {
 
-setUpSvg();
+      console.log('stop drawing')
+      drawing = false;
+    })
+    .on('mouseover', function(d) {
 
-function setUpSvg() {
-  svg = d3.select('#flashsvg')
+      console.log(this)
+      if(drawing) {
+        d3.select(this).attr('fill', 'rgb(250, 250, 250)')
 
-  svg.attr('width', width * screenWidth)
-  svg.attr('height', screenHeight * height)
+        pixels[d.xin + d.yin*screenWidth].color = [200, 200, 200];
+        sendToFlaschen(pixels)
 
-  svg.style('background-color', 'pink')
-
-  pixels = []
-
-  for (let y = 0; y < screenHeight; y++) {
-    for (let x = 0; x < screenWidth; x++) {
-      //  console.log(x)
-      pixels.push(new Pixel(x, y))
-    }
-  }
-}
-
-function flashenSvg (pxwidth, pxheight) {
-
-  var imgdat = ct.getImageData(0, 0, pxwidth, pxheight)
-
-  canToFlashen(imgdat)
-
-  drawFlash(pixels)
+        console.log('want to change the color of ', d)
+      }
+    })
 
 }
+
+
 
 // console.log(ct.getImageData(0, 0, 200, 200))
 function drawFlash (data) {
@@ -184,18 +120,6 @@ function canToFlashen (imgdat) {
   sendToFlaschen(pixels)
 }
 
-function setupInput () {
-  var linkinput = d3.select('#linkin')
-  linkinput.on('keydown', function (err, d, e) {
-  //  var linkinput = d3.select('#linkin');
-    if (err) {
-      console.log('somehow there was an error on keydown it is, ', err)
-    }
-    console.log('and d on keydown is, ', d)
-  })
-  // console.log(linkinput.value)
-  linkinput.attr('value', imgi.src)
-}
 
 
 
@@ -209,7 +133,6 @@ d3.select('#updateBut')
 d3.select('#contcheck')
   .on('change', function (d, i) {
     console.log('checkedout', d, this.checked)
-    flashenSvg(imgi.width, imgi.height)
     if (this.checked) {
       keepsending()
     }
@@ -230,6 +153,7 @@ function keepsending () {
 
 function sendToFlaschen(data) {
     // console.log("Got info from the client it is: " + data);
+
   var datum = data // .split('\n');
   for (let d of datum) {
     try {
@@ -238,19 +162,15 @@ function sendToFlaschen(data) {
       var color = d.color
       flash.set(d.xin, d.yin, color)
     } catch (e) {
+
       console.log(e)
     }
   }
+
   flash.show()
 }
 
-// this part handles users dropping files into the red box
-var dropbox;
 
-dropbox = document.getElementById("filedragspot");
-dropbox.addEventListener("dragenter", dragenter, false);
-dropbox.addEventListener("dragover", dragover, false);
-dropbox.addEventListener("drop", drop, false);
 
 function dragenter(e) {
   e.stopPropagation();
@@ -279,14 +199,10 @@ function handleFileDropl(filers) {
   imgi.src = window.URL.createObjectURL(fileList[0])
 }
 
-
 // basic flow of the app
 // set up text input and will load and show inital image and allow all the
 // stuff to work
-setupInput()
-
 // new stuff ends here
-
   // user canvas
   var c = document.getElementById( 'mycanvas')
   var ctx = c.getContext('2d');
@@ -297,34 +213,9 @@ setupInput()
   var tempCanvas = document.createElement('canvas');
   var tempCtx = tempCanvas.getContext('2d')
 
-  var url = document.getElementById('linkin');
   // default gif
 
-  // load the default gif
-//  loadGIF();
-  var gif;
 
-  // load a gif with the current input url value
-  function loadGIF(){
-  	var oReq = new XMLHttpRequest();
-  	oReq.open("GET", url.value, true);
-  	oReq.responseType = "arraybuffer";
-
-  	oReq.onload = function (oEvent) {
-
-  	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
-  	    if (arrayBuffer) {
-  	        gif = new GIF(arrayBuffer);
-  	        var frames = gif.decompressFrames(true);
-  	       // console.log(gif);
-            //console.log('frames = ', frames)
-  	        // render the gif
-  	        renderGIF(frames);
-  	    }
-  	};
-
-  	oReq.send(null);
-  }
 
   var playing = false;
   var bEdgeDetect = false;
@@ -341,33 +232,12 @@ setupInput()
   	}
   }
 
-  function renderGIF(frames){
 
-  	 loadedFrames = frames;
-  //  console.log('frames = ', frames)
-  	   frameIndex = 0;
-  //  if(frames.dims){
-    console.log('framcs width supposedly,', frames[0].dims.width)
 
-    	c.width = frames[0].dims.width;
-    	c.height = frames[0].dims.height;
-
-    	gifCanvas.width = c.width;
-    	gifCanvas.height = c.height;
-
-    	if(!playing){
-    		playpause();
-    	}
-
-  //  }
-  }
-
-  var frameImageData;
 
   function drawPatch(frame){
     if(frame ){
     	var dims = frame.dims;
-
     	if(!frameImageData || dims.width != frameImageData.width || dims.height != frameImageData.height){
     		tempCanvas.width = dims.width;
     		tempCanvas.height = dims.height;
@@ -478,6 +348,7 @@ setupInput()
 
   }
 
+
   function renderFrame(){
   	// get the frame
   	var frame = loadedFrames[frameIndex];
@@ -512,30 +383,3 @@ setupInput()
     	}
     }
   }
-
-
-
-  d3.select('#urlbut')
-    .on('click', function(d){
-      var linkinpu = d3.select('#linkin');
-      var newlink = linkinpu.attr('text')
-      playing = false
-      var linksplit = document.getElementById('linkin').value;
-      console.log(linksplit, 'ender = ',  linksplit.split('.')[linksplit.split('.').length-1])
-
-    //  console.log('update image with', (linkinpu[0][0].value).split('.')[linksplit.length -1])
-      if( linksplit.split('.')[linksplit.split('.').length -1] !== 'gif'){
-        console.log('thinks its not a gif')
-        imgi.src = linksplit;
-      }
-      else{
-      //  imgi.src = linkinpu[0][0].value;
-        console.log('need to do gif stuff')
-    //    playing = true;
-        url.value = linksplit;
-        loadGIF()
-
-        //c = canny;
-      }
-
-    })
