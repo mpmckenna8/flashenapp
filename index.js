@@ -20,7 +20,12 @@ var pixels = setUpSvg(screenWidth, screenHeight);
 
 console.log('pixels after setup', pixels)
 
+
+
 sendToFlaschen(pixels)
+
+
+
 
 
 window.addEventListener('keydown', function (e) {
@@ -36,6 +41,28 @@ window.addEventListener('keydown', function (e) {
 
 
 enableDraw();
+
+
+
+function resetPixels() {
+  console.log('need to reset pixels')
+
+  let newpixels = [];
+  d3.selectAll('rect')
+    .attr('fill', 'rbg(1,1,1)')
+
+    for (let y = 0; y < screenHeight; y++) {
+      for (let x = 0; x < screenWidth; x++) {
+        //  console.log(x)
+        newpixels.push(new Pixel(x, y))
+      }
+    }
+
+    pixels =  newpixels;
+    sendToFlaschen(pixels)
+}
+
+
 
 function enableDraw() {
 
