@@ -45,5 +45,14 @@ function setUpSvg(screenWidth, screenHeight) {
             return d3.rgb(d.color[0], d.color[1], d.color[2])
           })
 
+
+      let draw_color = [0,0,0]
+      let colorInput = d3.select('#colorChooser')
+            .on('change', (d) => {
+
+              console.log('d is ', d)
+              console.log('this is', this)
+            })
+
   return pixels
 }

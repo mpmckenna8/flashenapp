@@ -4,12 +4,15 @@
   "productName": "Flaschenapp",
   "devDependencies": {
     "electron": "1.4.13",
+    "electron-builder": "^20.28.4",
     "standard": "^10.0.2"
   },
   "description": "\"Desktop app to f with the flashentaschen\"",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "keywords": [
     "flaschentaschen",
@@ -21,7 +24,6 @@
   "license": "ISC",
   "dependencies": {
     "d3": "4.8.0",
-    "electron": "^1.4.15",
     "flaschenode": "0.0.4"
   }
 }

@@ -20,8 +20,6 @@ var pixels = setUpSvg(screenWidth, screenHeight);
 
 console.log('pixels after setup', pixels)
 
-
-
 sendToFlaschen(pixels)
 
 
@@ -63,9 +61,24 @@ function resetPixels() {
 }
 
 
+let draw_color = {r:0, g:0, b:0};
+let colorInput = d3.select('#colorChooser')
+     .on('change', function(d)  {
+
+        console.log('d is ', d)
+        console.log('this is', this.value)
+        let rgbobj = hexToRgb(this.value);
+        draw_color = rgbobj;
+        console.log('color change', draw_color)
+
+
+      })
+
+
+
+
 
 function enableDraw() {
-
 
   d3.selectAll('rect')
     .on('mousedown', (d) => {
@@ -82,12 +95,17 @@ function enableDraw() {
 
       console.log(this)
       if(drawing) {
-        d3.select(this).attr('fill', 'rgb(250, 250, 250)')
+        d3.select(this).attr('fill', function(d) {
 
-        pixels[d.xin + d.yin*screenWidth].color = [200, 200, 200];
+        pixels[d.xin + d.yin*screenWidth].color = [draw_color.r , draw_color.g , draw_color.b ];
         sendToFlaschen(pixels)
 
+        return 'rgb(' + draw_color.r + ',' + draw_color.g + ',' + draw_color.b + ')'
+
+
+
         console.log('want to change the color of ', d)
+      })
       }
     })
 
@@ -409,4 +427,20 @@ function handleFileDropl(filers) {
     		}, Math.max(0, Math.floor(frame.delay - diff)));
     	}
     }
+  }
+
+
+  function hexToRgb(hex) {
+      // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+      var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+      hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+          return r + r + g + g + b + b;
+      });
+
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+      } : null;
   }
