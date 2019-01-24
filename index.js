@@ -3,16 +3,19 @@
 var flash = require('flaschenode')
 var d3 = require('d3')
 var Pixel = require('./pixer.js')
+let initFlash = require('./initflash.js')
 var refreshDelay = 500
 
-flash.layer = 13
-flash.init()
+initFlash(flash)
 
+// create the right length buffer string;
 var datb = Buffer.alloc(flash.headerString().length + flash.footerString().length + flash.height * flash.width * 3)
 
 flash.data = datb
 
 datb.write(flash.headerString(), 0)
+
+
 var starfoo = datb.length - flash.footerString().length
 datb.write(flash.footerString(), starfoo)
 
