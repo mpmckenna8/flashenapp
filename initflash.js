@@ -1,4 +1,5 @@
-// a function to initialize the flashentashen 
+// a function to initialize the flashentashen
+
 
 module.exports = function(flash) {
   flash.layer = 13;
@@ -10,8 +11,8 @@ module.exports = function(flash) {
 
   var starfoo = datb.length - flash.footerString().length
   datb.write(flash.footerString(), starfoo)
-  
-  
+
+
   flash.data = datb
 
 }

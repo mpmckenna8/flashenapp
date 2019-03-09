@@ -4,26 +4,14 @@ var flash = require('flaschenode')
 var d3 = require('d3')
 var Pixel = require('./pixer.js')
 let initFlash = require('./initflash.js')
+let setUpLayerSelect = require('./js/setuplayerselect.js')
+
 var refreshDelay = 500
 
 initFlash(flash)
 
-// create the right length buffer string;
-var datb = Buffer.alloc(flash.headerString().length + flash.footerString().length + flash.height * flash.width * 3)
 
-flash.data = datb
-
-datb.write(flash.headerString(), 0)
-
-
-var starfoo = datb.length - flash.footerString().length
-datb.write(flash.footerString(), starfoo)
-
-var src = 'https://static.pexels.com/photos/17767/pexels-photo.jpg'
 let svg
-
-console.log('new try with src, ', src)
-
 var imgi = new Image();  // eslint-disable-line
 
 var layers = [];
@@ -39,35 +27,17 @@ for (i = 1; i < 16; i++) {
 }
 
 console.log(layers)
-d3.select('#layerselect') .on('change', function(d){
-   console.log('it changed, ', this.value)
-   flash.layer = parseInt(this.value);
-   datb.write(flash.headerString(), 0);
- }).selectAll('option')
- .data(layers)
- .enter()
- .append('option')
- .attr('value', function(d){
-   console.log('d of val', d)
-   return d
- })
- .attr('selected', function(d){
-   if( d === flash.layer ) {
-     return true;
-   }
-   return false
- })
- .text( (d)=>d )
+
+// layerselect part trying to separate out
+setUpLayerSelect( flash)
 
 
 // handle when an image is loaded.
 imgi.onload = function () {
   canny.width = imgi.width
   canny.height = imgi.height
-
   ct.drawImage(imgi, 0, 0)
   //  console.log(ct.getImageData(0, 0, img.width, img.height))
-
   flashenSvg(imgi.width, imgi.height);
 }
 
@@ -346,10 +316,9 @@ setupInput()
 
   function renderGIF(frames){
 
-  	 loadedFrames = frames;
+  	loadedFrames = frames;
   //  console.log('frames = ', frames)
-  	   frameIndex = 0;
-  //  if(frames.dims){
+  	frameIndex = 0;
     console.log('framcs width supposedly,', frames[0].dims.width)
 
     	c.width = frames[0].dims.width;
@@ -362,7 +331,6 @@ setupInput()
     		playpause();
     	}
 
-  //  }
   }
 
   var frameImageData;
