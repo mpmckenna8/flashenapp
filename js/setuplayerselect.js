@@ -1,7 +1,12 @@
 // move layer select to here
 
 module.exports = ( flash ) => {
+  var layers = [];
 
+  for (i = 1; i < 16; i++) {
+    layers.push(i);
+  }
+  
   d3.select('#layerselect') .on('change', function(d){
      console.log('it changed to newfunciton , this.value = , ', this.value)
      flash.layer = parseInt(this.value);
@@ -20,6 +25,6 @@ module.exports = ( flash ) => {
      }
      return false
    })
-   .text( (d)=>   d )
+   .text( (d) =>  d )
 
 }

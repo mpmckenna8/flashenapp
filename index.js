@@ -5,104 +5,116 @@ var d3 = require('d3')
 var Pixel = require('./pixer.js')
 let initFlash = require('./initflash.js')
 let setUpLayerSelect = require('./js/setuplayerselect.js')
+let handle_key_press = require('./js/handle_key_press.js')
+let setup_svg = require('./js/setup_svg.js')
+let add_text = require('./js/addtext.js')
+
+
 
 var refreshDelay = 500
 
 initFlash(flash)
 
+let svg = d3.select('#flashsvg')
 
-let svg
 var imgi = new Image();  // eslint-disable-line
+var canny = document.getElementById('mycanvas')
+var ct = canny.getContext('2d')
+// a gig link
+var src = 'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'
+// "https://media.giphy.com/media/SM32alLW9WEYo/giphy.gif"
 
-var layers = [];
-
-var src = 'https://static.pexels.com/photos/17767/pexels-photo.jpg'
-
-console.log('new try with src, ', src)
-
-var layers = [];
-
-for (i = 1; i < 16; i++) {
-  layers.push(i);
-}
-
-console.log(layers)
+// taco cat picture
+//'https://static.pexels.com/photos/17767/pexels-photo.jpg'
 
 // layerselect part trying to separate out
-setUpLayerSelect( flash)
+setUpLayerSelect( flash )
+
+let display_text = {
+                      text: '',
+                      x_offset: 0,
+                      y_offset:100,
+                      size:11
+                    }
+
+
+d3.select('#text_input').on('change', function(value) {
+  console.log('changed text to', this.value)
+
+  display_text.text = this.value
+
+})
+
+
+d3.select("#x_offset").on('change', function(e) {
+  display_text.x_offset = this.value;
+
+})
+
+d3.select("#y_offset").on('change', function(e) {
+  display_text.y_offset = this.value;
+
+})
+
+
+
+d3.select("#text_size").on('change', function(e) {
+  console.log('changed size to ', this.value)
+  display_text.size = this.value;
+
+})
+
 
 
 // handle when an image is loaded.
 imgi.onload = function () {
+
   canny.width = imgi.width
   canny.height = imgi.height
+
+
   ct.drawImage(imgi, 0, 0)
+
+  console.log('should be adding text', display_text)
+  add_text( display_text.text, ct, canny, display_text.x_offset ,display_text.y_offset,  display_text.size )
+
+
+//  add_text('over', ct, canny, 0,200, display_text.size)
+
+
   //  console.log(ct.getImageData(0, 0, img.width, img.height))
   flashenSvg(imgi.width, imgi.height);
 }
 
-imgi.src = 'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'// 'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
+imgi.src = src
+// 'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
 
-window.addEventListener('keydown', function (e) {
-  console.log('keycode=', e.keyCode)
-  if (e.keyCode === 80) console.log('pressed save thing') // save();
-  else if (e.keyCode === 70) {
-  //  const footer = new Buffer(flash.footerString())
-    console.log('want to make this auto send to the flashentaschen')
-  //  var srcData = src
-  //  var allcon // to hold the final buffer to send
-  }
-})
 
 var inputElement = document.getElementById('fileuploader')
+
 inputElement.addEventListener('change', handleFiles, false)
 
 function handleFiles () {
   var fileList = this.files /* now you can work with the file list */
-  console.log(fileList)
+  console.log( fileList )
   imgi.src = window.URL.createObjectURL(fileList[0])
 }
 
-var screenWidth= 45
-var screenHeight  = 35
+var screenWidth = 45;
+var screenHeight = 35;
 
-var width = 15
-var height = 15
-var pixels
+var width = 15;
+var height = 15;
+var pixels = [];
 
-
-var canny = document.getElementById('mycanvas')
-var ct = canny.getContext('2d')
+setup_svg( width, screenWidth, screenHeight, height );
 
 
-setUpSvg();
-
-function setUpSvg() {
-  svg = d3.select('#flashsvg')
-
-  svg.attr('width', width * screenWidth)
-  svg.attr('height', screenHeight * height)
-
-  svg.style('background-color', 'pink')
-
-  pixels = []
-
-  for (let y = 0; y < screenHeight; y++) {
-    for (let x = 0; x < screenWidth; x++) {
-      //  console.log(x)
-      pixels.push(new Pixel(x, y))
-    }
-  }
-}
 
 function flashenSvg (pxwidth, pxheight) {
-
   var imgdat = ct.getImageData(0, 0, pxwidth, pxheight)
-
   canToFlashen(imgdat)
-
   drawFlash(pixels)
-
 }
 
 // console.log(ct.getImageData(0, 0, 200, 200))
@@ -266,8 +278,11 @@ setupInput()
   // gif patch canvas
 
   var gifCanvas = document.createElement('canvas');
+
+
   var gifCtx = gifCanvas.getContext('2d');
   var tempCanvas = document.createElement('canvas');
+
   var tempCtx = tempCanvas.getContext('2d')
 
   var url = document.getElementById('linkin');
@@ -319,7 +334,7 @@ setupInput()
   	loadedFrames = frames;
   //  console.log('frames = ', frames)
   	frameIndex = 0;
-    console.log('framcs width supposedly,', frames[0].dims.width)
+//    console.log('framcs width supposedly,', frames[0].dims.width)
 
     	c.width = frames[0].dims.width;
     	c.height = frames[0].dims.height;
