@@ -2,20 +2,32 @@
 // new stuff starts here
 var flash = require('flaschenode')
 var d3 = require('d3')
+
+
 let initFlash = require('./initflash.js')
 let setUpLayerSelect = require('./js/setuplayerselect.js')
 let handle_key_press = require('./js/handle_key_press.js')
 let setup_svg = require('./js/setup_svg.js')
 let add_text = require('./js/addtext.js')
-let imgi = require('./sj/image.js')
+let image = require('./js/image.js')
+let setupInput = require('./js/setup_url_input.js')
 
-let settings = require('./js/settings.js')
-// setting variables
+
+let settings = require('./js/settings.js');
+
+let setup_text_input = require('./js/setup_text_input.js') (settings)
+
+
 
 initFlash(flash)
 
 var canny = document.getElementById('mycanvas')
 var ct = canny.getContext('2d')
+
+let imgi = image();
+
+
+
 // a gig link
 var src = 'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'
 // "https://media.giphy.com/media/SM32alLW9WEYo/giphy.gif"
@@ -39,12 +51,13 @@ imgi.onload = function () {
   //console.log('should be adding text', display_text)
 
   // adds text to an image, doesn't work for gifs and stuff here
-  add_text( setings.display_text.text, ct, canny, settings.display_text.x_offset , settings.display_text.y_offset,  settings.display_text.size )
+//  add_text( setings.display_text.text, ct, canny, settings.display_text.x_offset , settings.display_text.y_offset,  settings.display_text.size )
 
 //  add_text('over', ct, canny, 0,200, settings.display_text.size)
   flashenSvg(imgi.width, imgi.height);
 
 }
+
 
 imgi.src = src
 // 'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
@@ -136,18 +149,6 @@ function canToFlashen (imgdat) {
   sendToFlaschen(settings.pixels)
 }
 
-function setupInput () {
-  var linkinput = d3.select('#linkin')
-  linkinput.on('keydown', function (err, d, e) {
-  //  var linkinput = d3.select('#linkin');
-    if (err) {
-      console.log('somehow there was an error on keydown it is, ', err)
-    }
-    console.log('and d on keydown is, ', d)
-  })
-  // console.log(linkinput.value)
-  linkinput.attr('value', imgi.src)
-}
 
 
 
@@ -235,9 +236,10 @@ function handleFileDropl(filers) {
 // basic flow of the app
 // set up text input and will load and show inital image and allow all the
 // stuff to work
-setupInput()
-// new stuff ends here
+setupInput( imgi )
 
+
+// new stuff ends here
   // user canvas
   var c = document.getElementById( 'mycanvas')
   var ctx = c.getContext('2d');
@@ -254,7 +256,6 @@ setupInput()
   var url = document.getElementById('linkin');
   // default gif
 
-//  loadGIF();
   var gif;
 
   // load a gif with the current input url value
@@ -278,6 +279,7 @@ setupInput()
 
   	oReq.send(null);
   }
+
 
 
 
@@ -319,6 +321,7 @@ setupInput()
 
   function drawPatch(frame){
     if(frame ){
+
     	var dims = frame.dims;
 
     	if(!frameImageData || dims.width != frameImageData.width || dims.height != frameImageData.height){
@@ -338,68 +341,13 @@ setupInput()
     }
   }
 
-  var edge = function(data, output){
+  var edge = require('./js/edge.js')
+  var invert = require('./js/invert.js')
 
-  	var odata = output.data;
-  	var width = gif.raw.lsd.width;
-  	var height = gif.raw.lsd.height;
+  var grayscale = require('./js/greyscale.js')
 
-  	var conv = [-1, -1, -1,
-  				-1, 8, -1,
-  				-1, -1, -1];
-  	var halfside = Math.floor(3/2);
+  function manipulate() {
 
-  	for(var y=0; y<height; y++){
-  		for(var x=0; x<width; x++){
-
-  			var r=0, g=0, b=0;
-  			for(var cy=0; cy<3; cy++){
-  				for(var cx=0; cx<3; cx++){
-
-  					var scy = (y - halfside + cy);
-  					var scx = (x - halfside + cx);
-
-  					if(scy >= 0 && scy < height && scx >= 0 && scx < width){
-  						var src = (scy * width + scx) * 4;
-  						var f= cy * 3 + cx;
-  						r += data[src] * conv[f];
-  						g += data[src + 1] * conv[f];
-  						b += data[src + 2] * conv[f];
-  					}
-  				}
-  			}
-
-  			var i = (y * width + x) * 4;
-  			odata[i]     = r;
-  			odata[i + 1] = g;
-  			odata[i + 2] = b;
-  			odata[i + 3] = 255;
-  		}
-  	}
-
-  	return output;
-  }
-
-  var invert = function(data) {
-  	for (var i = 0; i < data.length; i += 4) {
-  		data[i]     = 255 - data[i];     // red
-  		data[i + 1] = 255 - data[i + 1]; // green
-  		data[i + 2] = 255 - data[i + 2]; // blue
-  		data[i + 3] = 255;
-  	}
-  };
-
-  var grayscale = function(data) {
-  	for (var i = 0; i < data.length; i += 4) {
-  		var avg = (data[i] + data[i +1] + data[i +2]) / 3;
-  		data[i]     = avg; // red
-  		data[i + 1] = avg; // green
-  		data[i + 2] = avg; // blue
-  		data[i + 3] = 255;
-  	}
-  };
-
-  function manipulate(){
   	var imageData = gifCtx.getImageData(0, 0, gifCanvas.width, gifCanvas.height);
   	var other = gifCtx.createImageData(gifCanvas.width, gifCanvas.height);
 
@@ -425,13 +373,14 @@ setupInput()
   		ctx.imageSmoothingEnabled = false;
   	}
 
+
   	ctx.putImageData(imageData, 0, 0);
   	ctx.drawImage(c, 0, 0, c.width, c.height, 0, 0, pixelsX, pixelsY);
   	ctx.drawImage(c, 0, 0, pixelsX, pixelsY, 0, 0, c.width, c.height);
 
   }
 
-  function renderFrame(){
+  function renderFrame() {
   	// get the frame
   	var frame = loadedFrames[frameIndex];
   	var start = new Date().getTime();
@@ -491,28 +440,4 @@ setupInput()
         //c = canny;
       }
 
-    })
-
-
-
-
-    d3.select('#text_input').on('change', function(value) {
-      console.log('changed text to', this.value)
-      settings.display_text.text = this.value
-    })
-
-
-    d3.select("#x_offset").on('change', function(e) {
-      settings.display_text.x_offset = this.value;
-    })
-
-    d3.select("#y_offset").on('change', function(e) {
-      settings.display_text.y_offset = this.value;
-    })
-
-
-
-    d3.select("#text_size").on('change', function(e) {
-      console.log('changed size to ', this.value)
-      settings.display_text.size = this.value;
     })
