@@ -10,8 +10,16 @@ let setup_svg = require('./js/setup_svg.js')
 let add_text = require('./js/addtext.js')
 
 
-
+// setting variables
 var refreshDelay = 500
+
+var screenWidth = 45;
+var screenHeight = 35;
+
+var width = 15;
+var height = 15;
+var pixels = [];
+
 
 initFlash(flash)
 
@@ -38,74 +46,43 @@ let display_text = {
                     }
 
 
-d3.select('#text_input').on('change', function(value) {
-  console.log('changed text to', this.value)
-
-  display_text.text = this.value
-
-})
-
-
-d3.select("#x_offset").on('change', function(e) {
-  display_text.x_offset = this.value;
-
-})
-
-d3.select("#y_offset").on('change', function(e) {
-  display_text.y_offset = this.value;
-
-})
-
-
-
-d3.select("#text_size").on('change', function(e) {
-  console.log('changed size to ', this.value)
-  display_text.size = this.value;
-
-})
-
-
-
 // handle when an image is loaded.
 imgi.onload = function () {
-
+  console.log('image loaded')
   canny.width = imgi.width
   canny.height = imgi.height
-
-
   ct.drawImage(imgi, 0, 0)
+  //console.log('should be adding text', display_text)
 
-  console.log('should be adding text', display_text)
-  add_text( display_text.text, ct, canny, display_text.x_offset ,display_text.y_offset,  display_text.size )
 
+  add_text( display_text.text, ct, canny, display_text.x_offset , display_text.y_offset,  display_text.size )
 
 //  add_text('over', ct, canny, 0,200, display_text.size)
-
-
-  //  console.log(ct.getImageData(0, 0, img.width, img.height))
   flashenSvg(imgi.width, imgi.height);
+
 }
 
 imgi.src = src
 // 'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
 
 
+// This is for when you upload a file from your filesystem
 var inputElement = document.getElementById('fileuploader')
+
 
 inputElement.addEventListener('change', handleFiles, false)
 
-function handleFiles () {
-  var fileList = this.files /* now you can work with the file list */
+function handleFiles (e) {
+
+  console.log('nnoooooo')
+  console.log('handling files', e)
+  var fileList = this.files
+  /* now you can work with the file list */
   console.log( fileList )
   imgi.src = window.URL.createObjectURL(fileList[0])
+
 }
 
-var screenWidth = 45;
-var screenHeight = 35;
-
-var width = 15;
-var height = 15;
-var pixels = [];
 
 setup_svg( width, screenWidth, screenHeight, height );
 
@@ -119,6 +96,7 @@ function flashenSvg (pxwidth, pxheight) {
 
 // console.log(ct.getImageData(0, 0, 200, 200))
 function drawFlash (data) {
+  console.log('drawFlash running,', data)
   svg.selectAll('rect').remove()
 
   var pixs = svg.selectAll('rect')
@@ -524,4 +502,28 @@ setupInput()
         //c = canny;
       }
 
+    })
+
+
+
+
+    d3.select('#text_input').on('change', function(value) {
+      console.log('changed text to', this.value)
+      display_text.text = this.value
+    })
+
+
+    d3.select("#x_offset").on('change', function(e) {
+      display_text.x_offset = this.value;
+    })
+
+    d3.select("#y_offset").on('change', function(e) {
+      display_text.y_offset = this.value;
+    })
+
+
+
+    d3.select("#text_size").on('change', function(e) {
+      console.log('changed size to ', this.value)
+      display_text.size = this.value;
     })
