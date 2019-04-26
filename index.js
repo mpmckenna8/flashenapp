@@ -2,30 +2,18 @@
 // new stuff starts here
 var flash = require('flaschenode')
 var d3 = require('d3')
-var Pixel = require('./pixer.js')
 let initFlash = require('./initflash.js')
 let setUpLayerSelect = require('./js/setuplayerselect.js')
 let handle_key_press = require('./js/handle_key_press.js')
 let setup_svg = require('./js/setup_svg.js')
 let add_text = require('./js/addtext.js')
+let imgi = require('./sj/image.js')
 
-
+let settings = require('./js/settings.js')
 // setting variables
-var refreshDelay = 500
-
-var screenWidth = 45;
-var screenHeight = 35;
-
-var width = 15;
-var height = 15;
-var pixels = [];
-
 
 initFlash(flash)
 
-let svg = d3.select('#flashsvg')
-
-var imgi = new Image();  // eslint-disable-line
 var canny = document.getElementById('mycanvas')
 var ct = canny.getContext('2d')
 // a gig link
@@ -38,26 +26,22 @@ var src = 'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'
 // layerselect part trying to separate out
 setUpLayerSelect( flash )
 
-let display_text = {
-                      text: '',
-                      x_offset: 0,
-                      y_offset:100,
-                      size:11
-                    }
-
 
 // handle when an image is loaded.
+
+
 imgi.onload = function () {
+
   console.log('image loaded')
   canny.width = imgi.width
   canny.height = imgi.height
   ct.drawImage(imgi, 0, 0)
   //console.log('should be adding text', display_text)
 
+  // adds text to an image, doesn't work for gifs and stuff here
+  add_text( setings.display_text.text, ct, canny, settings.display_text.x_offset , settings.display_text.y_offset,  settings.display_text.size )
 
-  add_text( display_text.text, ct, canny, display_text.x_offset , display_text.y_offset,  display_text.size )
-
-//  add_text('over', ct, canny, 0,200, display_text.size)
+//  add_text('over', ct, canny, 0,200, settings.display_text.size)
   flashenSvg(imgi.width, imgi.height);
 
 }
@@ -77,6 +61,7 @@ function handleFiles (e) {
   console.log('nnoooooo')
   console.log('handling files', e)
   var fileList = this.files
+
   /* now you can work with the file list */
   console.log( fileList )
   imgi.src = window.URL.createObjectURL(fileList[0])
@@ -84,33 +69,37 @@ function handleFiles (e) {
 }
 
 
-setup_svg( width, screenWidth, screenHeight, height );
+setup_svg( settings );
 
 
 
 function flashenSvg (pxwidth, pxheight) {
+
   var imgdat = ct.getImageData(0, 0, pxwidth, pxheight)
+
   canToFlashen(imgdat)
-  drawFlash(pixels)
+
+  drawFlash(settings.pixels)
+
 }
 
 // console.log(ct.getImageData(0, 0, 200, 200))
 function drawFlash (data) {
   console.log('drawFlash running,', data)
-  svg.selectAll('rect').remove()
+  settings.svg.selectAll('rect').remove()
 
-  var pixs = svg.selectAll('rect')
+  var pixs = settings.svg.selectAll('rect')
       .data(data)
 
   pixs.enter().append('rect')
       .attr('x', function (d) {
     //  console.log(d)
-        return width * d.xin
+        return settings.svg_pixel_width * d.xin
       })
-      .attr('width', width)
-        .attr('height', height)
+      .attr('width', settings.svg_pixel_width)
+      .attr('height', settings.svg_pixel_height)
       .attr('y', function (d) {
-        return height * d.yin
+        return settings.svg_pixel_height * d.yin
       })
       .attr('id', function (d) {
         return 'p' + d.xin + '-' + d.yin
@@ -130,21 +119,21 @@ function canToFlashen (imgdat) {
   var imageWidth = imgdat.width
   var imageHeight = imgdat.height
 
-  var xoff = Math.floor(imageWidth / screenWidth)
+  var xoff = Math.floor(imageWidth / settings.screenWidth)
 
-  var yoff = Math.floor(imageHeight / screenHeight)
+  var yoff = Math.floor(imageHeight / settings.screenHeight)
 
 // each x picwel we need to go four through * imageWidth/screenHeight
-  for (let y = 0; y < screenHeight; y++) {
-    for (let x = 0; x < screenWidth; x++) {
+  for (let y = 0; y < settings.screenHeight; y++) {
+    for (let x = 0; x < settings.screenWidth; x++) {
       var indi = ((xoff) * x * 4 + (yoff * imageWidth) * y * 4)
 
         // counter= counter+1;
-      pixels[x + y * screenWidth].color = [imgdat.data[indi],
+      settings.pixels[x + y * settings.screenWidth].color = [imgdat.data[indi],
         imgdat.data[indi + 1], imgdat.data[indi + 2]]
     }
   }
-  sendToFlaschen(pixels)
+  sendToFlaschen(settings.pixels)
 }
 
 function setupInput () {
@@ -165,7 +154,7 @@ function setupInput () {
 // Handle click on the button to update the flashentaschen
 d3.select('#updateBut')
   .on('click', function (d) {
-    sendToFlaschen(pixels)
+    sendToFlaschen(settings.pixels)
   })
 
 // When the check box if checked handle refreshing the flashentaschen or not
@@ -188,7 +177,7 @@ function keepsending () {
     } else {
       keepsending()
     }
-  }, refreshDelay)
+  }, settings.refreshDelay)
 }
 
 function sendToFlaschen(data) {
@@ -247,7 +236,6 @@ function handleFileDropl(filers) {
 // set up text input and will load and show inital image and allow all the
 // stuff to work
 setupInput()
-
 // new stuff ends here
 
   // user canvas
@@ -266,7 +254,6 @@ setupInput()
   var url = document.getElementById('linkin');
   // default gif
 
-  // load the default gif
 //  loadGIF();
   var gif;
 
@@ -291,6 +278,8 @@ setupInput()
 
   	oReq.send(null);
   }
+
+
 
   var playing = false;
   var bEdgeDetect = false;
@@ -509,21 +498,21 @@ setupInput()
 
     d3.select('#text_input').on('change', function(value) {
       console.log('changed text to', this.value)
-      display_text.text = this.value
+      settings.display_text.text = this.value
     })
 
 
     d3.select("#x_offset").on('change', function(e) {
-      display_text.x_offset = this.value;
+      settings.display_text.x_offset = this.value;
     })
 
     d3.select("#y_offset").on('change', function(e) {
-      display_text.y_offset = this.value;
+      settings.display_text.y_offset = this.value;
     })
 
 
 
     d3.select("#text_size").on('change', function(e) {
       console.log('changed size to ', this.value)
-      display_text.size = this.value;
+      settings.display_text.size = this.value;
     })
