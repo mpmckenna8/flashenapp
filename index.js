@@ -2,7 +2,7 @@
 // new stuff starts here
 var flash = require('flaschenode')
 var d3 = require('d3')
-
+let Jimp = require('jimp')
 
 let initFlash = require('./initflash.js')
 let setUpLayerSelect = require('./js/setuplayerselect.js')
@@ -13,6 +13,7 @@ let image = require('./js/image.js')
 let setupInput = require('./js/setup_url_input.js')
 
 
+
 let settings = require('./js/settings.js');
 
 let setup_text_input = require('./js/setup_text_input.js') (settings)
@@ -21,8 +22,8 @@ let setup_text_input = require('./js/setup_text_input.js') (settings)
 
 initFlash(flash)
 
-var canny = document.getElementById('mycanvas')
-var ct = canny.getContext('2d')
+var display_canvas = document.getElementById('mycanvas')
+var ct = display_canvas.getContext('2d')
 
 let imgi = image();
 
@@ -45,15 +46,19 @@ setUpLayerSelect( flash )
 imgi.onload = function () {
 
   console.log('image loaded')
-  canny.width = imgi.width
-  canny.height = imgi.height
+  // set the canvas hight and width to that of the picture.
+  display_canvas.width = imgi.width
+  display_canvas.height = imgi.height
+  // draws the imabe to the canvas
   ct.drawImage(imgi, 0, 0)
+
+
+
   //console.log('should be adding text', display_text)
-
   // adds text to an image, doesn't work for gifs and stuff here
-//  add_text( setings.display_text.text, ct, canny, settings.display_text.x_offset , settings.display_text.y_offset,  settings.display_text.size )
+//  add_text( setings.display_text.text, ct, display_canvas, settings.display_text.x_offset , settings.display_text.y_offset,  settings.display_text.size )
 
-//  add_text('over', ct, canny, 0,200, settings.display_text.size)
+//  add_text('over', ct, display_canvas, 0,200, settings.display_text.size)
   flashenSvg(imgi.width, imgi.height);
 
 }
@@ -63,23 +68,6 @@ imgi.src = src
 // 'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
 
 
-// This is for when you upload a file from your filesystem
-var inputElement = document.getElementById('fileuploader')
-
-
-inputElement.addEventListener('change', handleFiles, false)
-
-function handleFiles (e) {
-
-  console.log('nnoooooo')
-  console.log('handling files', e)
-  var fileList = this.files
-
-  /* now you can work with the file list */
-  console.log( fileList )
-  imgi.src = window.URL.createObjectURL(fileList[0])
-
-}
 
 
 setup_svg( settings );
@@ -197,41 +185,6 @@ function sendToFlaschen(data) {
   flash.show()
 }
 
-// this part handles users dropping files into the red box
-var dropbox;
-
-dropbox = document.getElementById("filedragspot");
-dropbox.addEventListener("dragenter", dragenter, false);
-dropbox.addEventListener("dragover", dragover, false);
-dropbox.addEventListener("drop", drop, false);
-
-function dragenter(e) {
-  e.stopPropagation();
-  e.preventDefault();
-}
-
-function dragover(e) {
-  e.stopPropagation();
-  e.preventDefault();
-}
-
-function drop(e) {
-  e.stopPropagation();
-  e.preventDefault();
-
-  var dt = e.dataTransfer;
-  var files = dt.files;
-
-  handleFileDrop(files);
-
-}
-
-function handleFileDropl(filers) {
-  var fileList = filers /* now you can work with the file list */
-  console.log(filers)
-  imgi.src = window.URL.createObjectURL(fileList[0])
-}
-
 
 // basic flow of the app
 // set up text input and will load and show inital image and allow all the
@@ -239,7 +192,7 @@ function handleFileDropl(filers) {
 setupInput( imgi )
 
 
-// new stuff ends here
+  // new stuff ends here
   // user canvas
   var c = document.getElementById( 'mycanvas')
   var ctx = c.getContext('2d');
@@ -271,7 +224,6 @@ setupInput( imgi )
   	        gif = new GIF(arrayBuffer);
   	        var frames = gif.decompressFrames(true);
   	       // console.log(gif);
-            //console.log('frames = ', frames)
   	        // render the gif
   	        renderGIF(frames);
   	    }
@@ -320,7 +272,7 @@ setupInput( imgi )
   var frameImageData;
 
   function drawPatch(frame){
-    if(frame ){
+    if( frame ){
 
     	var dims = frame.dims;
 
@@ -329,7 +281,6 @@ setupInput( imgi )
     		tempCanvas.height = dims.height;
     		frameImageData = tempCtx.createImageData(dims.width, dims.height);
     	}
-
     	// set the patch data as an override
     	frameImageData.data.set(frame.patch);
 
@@ -437,7 +388,7 @@ setupInput( imgi )
         url.value = linksplit;
         loadGIF()
 
-        //c = canny;
+        //c = display_canvas;
       }
 
     })
