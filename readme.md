@@ -30,6 +30,10 @@ gifs
 When I add gif functionality I think I'll use http://matt-way.github.io/gifuct-js/
 
 
+
+text;
+Could just add text to a canvas or try and draw stuff with something like. https://github.com/PaulBGD/PixelFont/blob/master/script.js
+
 More UI stuff and maybe a help screen. Maybe just a link to a .md document with simple instructions and screenshots.
 
 
