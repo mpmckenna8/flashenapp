@@ -12,6 +12,7 @@ let add_text = require('./js/addtext.js')
 let image = require('./js/image.js')
 let setupInput = require('./js/setup_url_input.js')
 
+let sendToFlaschen = require('./js/send_to_flaschen.js')
 
 
 let settings = require('./js/settings.js');
@@ -68,10 +69,7 @@ imgi.src = src
 // 'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
 
 
-
-
 setup_svg( settings );
-
 
 
 function flashenSvg (pxwidth, pxheight) {
@@ -134,7 +132,7 @@ function canToFlashen (imgdat) {
         imgdat.data[indi + 1], imgdat.data[indi + 2]]
     }
   }
-  sendToFlaschen(settings.pixels)
+  sendToFlaschen(settings.pixels, flash)
 }
 
 
@@ -143,7 +141,7 @@ function canToFlashen (imgdat) {
 // Handle click on the button to update the flashentaschen
 d3.select('#updateBut')
   .on('click', function (d) {
-    sendToFlaschen(settings.pixels)
+    sendToFlaschen(settings.pixels, flash)
   })
 
 // When the check box if checked handle refreshing the flashentaschen or not
@@ -167,22 +165,6 @@ function keepsending () {
       keepsending()
     }
   }, settings.refreshDelay)
-}
-
-function sendToFlaschen(data) {
-    // console.log("Got info from the client it is: " + data);
-  var datum = data // .split('\n');
-  for (let d of datum) {
-    try {
-      //  var djson = JSON.parse(d);
-      //  console.log(djson.xin, djson.yin )
-      var color = d.color
-      flash.set(d.xin, d.yin, color)
-    } catch (e) {
-      console.log(e)
-    }
-  }
-  flash.show()
 }
 
 
