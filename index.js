@@ -11,22 +11,25 @@ let setup_svg = require('./js/setup_svg.js')
 let add_text = require('./js/addtext.js')
 let image = require('./js/image.js')
 let setupInput = require('./js/setup_url_input.js')
+let drawFlash = require('./js/draw_flaschen.js')
 
-let sendToFlaschen = require('./js/send_to_flaschen.js')
-
+let sendToFlaschen = require( './js/send_to_flaschen.js' )
+let canvas_to_flash = require('./js/canvas_to_flaschen.js')
+let keepsending = require('./js/keep_sending_to_flash.js')
 
 let settings = require('./js/settings.js');
 
 let setup_text_input = require('./js/setup_text_input.js') (settings)
 
 
-
 initFlash(flash)
+
+
 
 var display_canvas = document.getElementById('mycanvas')
 var ct = display_canvas.getContext('2d')
 
-let imgi = image();
+let imgi = image( display_canvas, ct, flashenSvg );
 
 
 
@@ -41,99 +44,19 @@ var src = 'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'
 setUpLayerSelect( flash )
 
 
-// handle when an image is loaded.
-
-
-imgi.onload = function () {
-
-  console.log('image loaded')
-  // set the canvas hight and width to that of the picture.
-  display_canvas.width = imgi.width
-  display_canvas.height = imgi.height
-  // draws the imabe to the canvas
-  ct.drawImage(imgi, 0, 0)
-
-
-
-  //console.log('should be adding text', display_text)
-  // adds text to an image, doesn't work for gifs and stuff here
-//  add_text( setings.display_text.text, ct, display_canvas, settings.display_text.x_offset , settings.display_text.y_offset,  settings.display_text.size )
-
-//  add_text('over', ct, display_canvas, 0,200, settings.display_text.size)
-  flashenSvg(imgi.width, imgi.height);
-
-}
-
-
 imgi.src = src
 // 'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
-
 
 setup_svg( settings );
 
 
 function flashenSvg (pxwidth, pxheight) {
-
   var imgdat = ct.getImageData(0, 0, pxwidth, pxheight)
-
-  canToFlashen(imgdat)
-
-  drawFlash(settings.pixels)
+  canvas_to_flash( imgdat, settings, sendToFlaschen )
+  drawFlash( settings.pixels, settings )
 
 }
 
-// console.log(ct.getImageData(0, 0, 200, 200))
-function drawFlash (data) {
-  console.log('drawFlash running,', data)
-  settings.svg.selectAll('rect').remove()
-
-  var pixs = settings.svg.selectAll('rect')
-      .data(data)
-
-  pixs.enter().append('rect')
-      .attr('x', function (d) {
-    //  console.log(d)
-        return settings.svg_pixel_width * d.xin
-      })
-      .attr('width', settings.svg_pixel_width)
-      .attr('height', settings.svg_pixel_height)
-      .attr('y', function (d) {
-        return settings.svg_pixel_height * d.yin
-      })
-      .attr('id', function (d) {
-        return 'p' + d.xin + '-' + d.yin
-      })
-      .attr('d', function (d) {
-        return JSON.stringify(d)
-      })
-      .attr('stroke', 'blue')
-      .attr('fill', function (d) {
-      //  console.log(d.color)
-        return d3.rgb(d.color[0], d.color[1], d.color[2])
-      })
-}
-
-// my kind of lazy sampling of the canvas
-function canToFlashen (imgdat) {
-  var imageWidth = imgdat.width
-  var imageHeight = imgdat.height
-
-  var xoff = Math.floor(imageWidth / settings.screenWidth)
-
-  var yoff = Math.floor(imageHeight / settings.screenHeight)
-
-// each x picwel we need to go four through * imageWidth/screenHeight
-  for (let y = 0; y < settings.screenHeight; y++) {
-    for (let x = 0; x < settings.screenWidth; x++) {
-      var indi = ((xoff) * x * 4 + (yoff * imageWidth) * y * 4)
-
-        // counter= counter+1;
-      settings.pixels[x + y * settings.screenWidth].color = [imgdat.data[indi],
-        imgdat.data[indi + 1], imgdat.data[indi + 2]]
-    }
-  }
-  sendToFlaschen(settings.pixels, flash)
-}
 
 
 
@@ -141,7 +64,7 @@ function canToFlashen (imgdat) {
 // Handle click on the button to update the flashentaschen
 d3.select('#updateBut')
   .on('click', function (d) {
-    sendToFlaschen(settings.pixels, flash)
+    sendToFlaschen( settings.pixels, flash )
   })
 
 // When the check box if checked handle refreshing the flashentaschen or not
@@ -154,18 +77,6 @@ d3.select('#contcheck')
     }
   })
 
-function keepsending () {
-  flash.show();
-  //  console.log('is it still checked', d3.select('#contcheck')[0][0].checked)
-  setTimeout(function (elap) {
-    if (!(document.getElementById('contcheck').checked)) {
-      // t.stop();
-      console.log('stoping the refresh')
-    } else {
-      keepsending()
-    }
-  }, settings.refreshDelay)
-}
 
 
 // basic flow of the app
@@ -216,7 +127,6 @@ setupInput( imgi )
 
 
 
-
   var playing = false;
   var bEdgeDetect = false;
   var bInvert = false;
@@ -233,7 +143,6 @@ setupInput( imgi )
   }
 
   function renderGIF(frames){
-
   	loadedFrames = frames;
   //  console.log('frames = ', frames)
   	frameIndex = 0;
@@ -276,7 +185,6 @@ setupInput( imgi )
 
   var edge = require('./js/edge.js')
   var invert = require('./js/invert.js')
-
   var grayscale = require('./js/greyscale.js')
 
   function manipulate() {
@@ -340,7 +248,6 @@ setupInput( imgi )
     		// delay the next gif frame
         flashenSvg(c.width, c.height);
 
-    //    canToFlashen();
     		setTimeout(function(){
     			renderFrame()//requestAnimationFrame(renderFrame);
     		}, Math.max(0, Math.floor(frame.delay - diff)));
@@ -357,7 +264,6 @@ setupInput( imgi )
       playing = false
       var linksplit = document.getElementById('linkin').value;
       console.log(linksplit, 'ender = ',  linksplit.split('.')[linksplit.split('.').length-1])
-
     //  console.log('update image with', (linkinpu[0][0].value).split('.')[linksplit.length -1])
       if( linksplit.split('.')[linksplit.split('.').length -1] !== 'gif'){
         console.log('thinks its not a gif')
@@ -369,8 +275,6 @@ setupInput( imgi )
     //    playing = true;
         url.value = linksplit;
         loadGIF()
-
-        //c = display_canvas;
       }
 
     })
