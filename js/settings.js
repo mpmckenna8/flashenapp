@@ -17,5 +17,9 @@ module.exports = {
                         size:11
                       },
 
+  playing: false,
+  frameIndex: 0,
+  url: document.getElementById('linkin')
+
 
 }

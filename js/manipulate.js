@@ -1,8 +1,8 @@
 // function to manipulate imageSmoothingEnabled
 
-  var edge = require('./js/edge.js')
-  var invert = require('./js/invert.js')
-  var grayscale = require('./js/greyscale.js')
+  var edge = require('./edge.js')
+  var invert = require('./invert.js')
+  var grayscale = require('./greyscale.js')
   var pixelPercent = 100;
 
 

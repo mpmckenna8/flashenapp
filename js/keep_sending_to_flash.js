@@ -1,14 +1,18 @@
 // keep sending stuff to flashentaschen
 
 function keepsending ( flash ) {
+  console.log('is it still checked', flash)
+
   flash.show();
-  //  console.log('is it still checked', d3.select('#contcheck')[0][0].checked)
   setTimeout(function (elap) {
     if (!(document.getElementById('contcheck').checked)) {
       // t.stop();
       console.log('stoping the refresh')
     } else {
-      keepsending()
+
+      if(flash) {
+        keepsending(flash)
+      }
     }
   }, settings.refreshDelay)
 }

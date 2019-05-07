@@ -11,8 +11,11 @@ let handle_key_press = require('./js/handle_key_press.js')
 let setup_svg = require('./js/setup_svg.js')
 let add_text = require('./js/addtext.js')
 let image = require('./js/image.js')
-let setupInput = require('./js/setup_url_input.js')
 let drawFlash = require('./js/draw_flaschen.js');
+
+let playpause = require('./js/playpause.js')
+
+let manipulate = require('./js/manipulate.js');
 
 let sendToFlaschen = require( './js/send_to_flaschen.js' )
 let canvas_to_flash = require('./js/canvas_to_flaschen.js')
@@ -21,7 +24,7 @@ let keepsending = require('./js/keep_sending_to_flash.js')
 let settings = require('./js/settings.js');
 
 let setup_text_input = require('./js/setup_text_input.js') (settings)
-
+let setupInput = require('./js/setup_url_input.js')
 
 initFlash(flash)
 
@@ -43,13 +46,15 @@ var src = 'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'
 
 // layerselect part trying to separate out
 setUpLayerSelect( flash )
-setUp_ui( sendToFlaschen, settings, flash, imgi, ct, keepsending )
 
 
 imgi.src = src
 // 'http://www.dmu.ac.uk/webimages/About-DMU-images/News-images/2014/December/cyber-hack-inset.jpg'//'http://i2.kym-cdn.com/photos/images/newsfeed/000/674/934/422.jpg';
 
 setup_svg( settings );
+
+setUp_ui( sendToFlaschen, settings, flash, imgi, ct, keepsending )
+
 
 
 function flashenSvg (pxwidth, pxheight, ct) {
@@ -68,7 +73,6 @@ function flashenSvg (pxwidth, pxheight, ct) {
 setupInput( imgi )
 
 
-
   // new stuff ends here
   // user canvas
   var c = document.getElementById( 'mycanvas')
@@ -83,7 +87,6 @@ setupInput( imgi )
 
   var tempCtx = tempCanvas.getContext('2d')
 
-  var url = document.getElementById('linkin');
   // default gif
 
   var gif;
@@ -91,44 +94,34 @@ setupInput( imgi )
   // load a gif with the current input url value
   function loadGIF(){
   	var oReq = new XMLHttpRequest();
-  	oReq.open("GET", url.value, true);
+  	oReq.open("GET", settings.url.value, true);
   	oReq.responseType = "arraybuffer";
 
   	oReq.onload = function (oEvent) {
 
-  	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
+  	    var arrayBuffer = oReq.response;
   	    if (arrayBuffer) {
   	        gif = new GIF(arrayBuffer);
   	        var frames = gif.decompressFrames(true);
-  	       // console.log(gif);
   	        // render the gif
   	        renderGIF(frames);
   	    }
   	};
-
   	oReq.send(null);
   }
 
 
-
-  var playing = false;
   var bEdgeDetect = false;
   var bInvert = false;
   var bGrayscale = false;
+  var pixelPercent = 100;
   var loadedFrames;
-  var frameIndex;
 
-  function playpause(){
-  	playing = !playing;
-  	if(playing){
-  		renderFrame();
-  	}
-  }
 
   function renderGIF(frames){
   	loadedFrames = frames;
   //  console.log('frames = ', frames)
-  	frameIndex = 0;
+  	settings.frameIndex = 0;
 //    console.log('framcs width supposedly,', frames[0].dims.width)
 
     	c.width = frames[0].dims.width;
@@ -137,17 +130,16 @@ setupInput( imgi )
     	gifCanvas.width = c.width;
     	gifCanvas.height = c.height;
 
-    	if(!playing){
-    		playpause();
+    	if(!settings.playing){
+    		playpause(settings, renderFrame);
     	}
-
   }
+
 
   var frameImageData;
 
   function drawPatch(frame){
     if( frame ){
-
     	var dims = frame.dims;
 
     	if(!frameImageData || dims.width != frameImageData.width || dims.height != frameImageData.height){
@@ -170,7 +162,7 @@ setupInput( imgi )
 
   function renderFrame() {
   	// get the frame
-  	var frame = loadedFrames[frameIndex];
+  	var frame = loadedFrames[settings.frameIndex];
   	var start = new Date().getTime();
 
   	gifCtx.clearRect(0, 0, c.width, c.height);
@@ -178,20 +170,20 @@ setupInput( imgi )
   	drawPatch(frame);
 
   	// perform manipulation
-  	manipulate();
+  	manipulate(gifCanvas, gifCtx);
 
   	// update the frame index
     if( loadedFrames.length ){
 
-    	frameIndex++;
-    	if(frameIndex >= loadedFrames.length){
-    		frameIndex = 0;
+    	settings.frameIndex++;
+    	if(settings.frameIndex >= loadedFrames.length){
+    		settings.frameIndex = 0;
     	}
 
     	var end = new Date().getTime();
     	var diff = end - start;
 
-    	if(playing){
+    	if(settings.playing){
     		// delay the next gif frame
         flashenSvg(c.width, c.height, ct);
 
@@ -201,27 +193,3 @@ setupInput( imgi )
     	}
     }
   }
-
-
-
-  d3.select('#urlbut')
-    .on('click', function(d){
-      var linkinpu = d3.select('#linkin');
-      var newlink = linkinpu.attr('text')
-      playing = false
-      var linksplit = document.getElementById('linkin').value;
-      console.log(linksplit, 'ender = ',  linksplit.split('.')[linksplit.split('.').length-1])
-    //  console.log('update image with', (linkinpu[0][0].value).split('.')[linksplit.length -1])
-      if( linksplit.split('.')[linksplit.split('.').length -1] !== 'gif'){
-        console.log('thinks its not a gif')
-        imgi.src = linksplit;
-      }
-      else{
-      //  imgi.src = linkinpu[0][0].value;
-        console.log('need to do gif stuff')
-    //    playing = true;
-        url.value = linksplit;
-        loadGIF()
-      }
-
-    })
