@@ -15,6 +15,7 @@ module.exports = {
                         x_offset: 0,
                         y_offset:100,
                         size:11
-                      }
+                      },
+
 
 }

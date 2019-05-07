@@ -6,12 +6,13 @@ let Jimp = require('jimp')
 
 let initFlash = require('./initflash.js')
 let setUpLayerSelect = require('./js/setuplayerselect.js')
+let setUp_ui = require('./js/setup_ui.js')
 let handle_key_press = require('./js/handle_key_press.js')
 let setup_svg = require('./js/setup_svg.js')
 let add_text = require('./js/addtext.js')
 let image = require('./js/image.js')
 let setupInput = require('./js/setup_url_input.js')
-let drawFlash = require('./js/draw_flaschen.js')
+let drawFlash = require('./js/draw_flaschen.js');
 
 let sendToFlaschen = require( './js/send_to_flaschen.js' )
 let canvas_to_flash = require('./js/canvas_to_flaschen.js')
@@ -42,6 +43,7 @@ var src = 'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg'
 
 // layerselect part trying to separate out
 setUpLayerSelect( flash )
+setUp_ui( sendToFlaschen, settings, flash, imgi, ct, keepsending )
 
 
 imgi.src = src
@@ -50,7 +52,8 @@ imgi.src = src
 setup_svg( settings );
 
 
-function flashenSvg (pxwidth, pxheight) {
+function flashenSvg (pxwidth, pxheight, ct) {
+
   var imgdat = ct.getImageData(0, 0, pxwidth, pxheight)
   canvas_to_flash( imgdat, settings, sendToFlaschen )
   drawFlash( settings.pixels, settings )
@@ -59,30 +62,11 @@ function flashenSvg (pxwidth, pxheight) {
 
 
 
-
-
-// Handle click on the button to update the flashentaschen
-d3.select('#updateBut')
-  .on('click', function (d) {
-    sendToFlaschen( settings.pixels, flash )
-  })
-
-// When the check box if checked handle refreshing the flashentaschen or not
-d3.select('#contcheck')
-  .on('change', function (d, i) {
-    console.log('checkedout', d, this.checked)
-    flashenSvg(imgi.width, imgi.height)
-    if (this.checked) {
-      keepsending()
-    }
-  })
-
-
-
 // basic flow of the app
 // set up text input and will load and show inital image and allow all the
 // stuff to work
 setupInput( imgi )
+
 
 
   // new stuff ends here
@@ -131,7 +115,6 @@ setupInput( imgi )
   var bEdgeDetect = false;
   var bInvert = false;
   var bGrayscale = false;
-  var pixelPercent = 100;
   var loadedFrames;
   var frameIndex;
 
@@ -183,43 +166,7 @@ setupInput( imgi )
     }
   }
 
-  var edge = require('./js/edge.js')
-  var invert = require('./js/invert.js')
-  var grayscale = require('./js/greyscale.js')
 
-  function manipulate() {
-
-  	var imageData = gifCtx.getImageData(0, 0, gifCanvas.width, gifCanvas.height);
-  	var other = gifCtx.createImageData(gifCanvas.width, gifCanvas.height);
-
-  	if(bEdgeDetect){
-  		imageData = edge(imageData.data, other);
-  	}
-
-  	if(bInvert){
-  		invert(imageData.data);
-  	}
-
-  	if(bGrayscale){
-  		grayscale(imageData.data);
-  	}
-
-  	// do pixelation
-  	var pixelsX = 5 + Math.floor(pixelPercent / 100 * (c.width - 5));
-  	var pixelsY = (pixelsX * c.height) / c.width;
-
-  	if(pixelPercent != 100){
-  		ctx.mozImageSmoothingEnabled = false;
-  		ctx.webkitImageSmoothingEnabled = false;
-  		ctx.imageSmoothingEnabled = false;
-  	}
-
-
-  	ctx.putImageData(imageData, 0, 0);
-  	ctx.drawImage(c, 0, 0, c.width, c.height, 0, 0, pixelsX, pixelsY);
-  	ctx.drawImage(c, 0, 0, pixelsX, pixelsY, 0, 0, c.width, c.height);
-
-  }
 
   function renderFrame() {
   	// get the frame
@@ -246,7 +193,7 @@ setupInput( imgi )
 
     	if(playing){
     		// delay the next gif frame
-        flashenSvg(c.width, c.height);
+        flashenSvg(c.width, c.height, ct);
 
     		setTimeout(function(){
     			renderFrame()//requestAnimationFrame(renderFrame);
