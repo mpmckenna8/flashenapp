@@ -111,6 +111,7 @@ setupInput( imgi )
   }
 
 
+  var playing = false;
   var bEdgeDetect = false;
   var bInvert = false;
   var bGrayscale = false;
