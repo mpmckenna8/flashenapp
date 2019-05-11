@@ -19,7 +19,11 @@ module.exports = {
 
   playing: false,
   frameIndex: 0,
-  url: document.getElementById('linkin')
-
+  url: document.getElementById('linkin'),
+  bEdgeDetect: false,
+  bInvert: false,
+  bGrayscale: false,
+  pixelPercent: 100,
+  loadedFrames: null,
 
 }

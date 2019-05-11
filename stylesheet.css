@@ -36,3 +36,7 @@ input#contcheck {
   top: -1px;
   *overflow: hidden;
 }
+
+#text_input_div {
+  display: none;
+}

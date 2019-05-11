@@ -18,7 +18,6 @@ function canToFlashen (imgdat, settings, sendToFlaschen) {
         imgdat.data[indi + 1], imgdat.data[indi + 2]]
     }
   }
-
   sendToFlaschen(settings.pixels, flash)
 }
 

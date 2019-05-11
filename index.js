@@ -20,11 +20,14 @@ let manipulate = require('./js/manipulate.js');
 let sendToFlaschen = require( './js/send_to_flaschen.js' )
 let canvas_to_flash = require('./js/canvas_to_flaschen.js')
 let keepsending = require('./js/keep_sending_to_flash.js')
-
+let loadGIF = require('./js/load_gif.js')
 let settings = require('./js/settings.js');
 
 let setup_text_input = require('./js/setup_text_input.js') (settings)
 let setupInput = require('./js/setup_url_input.js')
+
+
+let flashenSvg = require('./js/handle_image.js')
 
 initFlash(flash)
 
@@ -33,7 +36,7 @@ initFlash(flash)
 var display_canvas = document.getElementById('mycanvas')
 var ct = display_canvas.getContext('2d')
 
-let imgi = image( display_canvas, ct, flashenSvg );
+let imgi = image( display_canvas, ct, flashenSvg, sendToFlaschen );
 
 
 
@@ -53,24 +56,15 @@ imgi.src = src
 
 setup_svg( settings );
 
+
 setUp_ui( sendToFlaschen, settings, flash, imgi, ct, keepsending )
-
-
-
-function flashenSvg (pxwidth, pxheight, ct) {
-
-  var imgdat = ct.getImageData(0, 0, pxwidth, pxheight)
-  canvas_to_flash( imgdat, settings, sendToFlaschen )
-  drawFlash( settings.pixels, settings )
-
-}
 
 
 
 // basic flow of the app
 // set up text input and will load and show inital image and allow all the
 // stuff to work
-setupInput( imgi )
+setupInput( imgi, gif, settings, renderGIF )
 
 
   // new stuff ends here
@@ -91,36 +85,11 @@ setupInput( imgi )
 
   var gif;
 
-  // load a gif with the current input url value
-  function loadGIF(){
-  	var oReq = new XMLHttpRequest();
-  	oReq.open("GET", settings.url.value, true);
-  	oReq.responseType = "arraybuffer";
 
-  	oReq.onload = function (oEvent) {
-
-  	    var arrayBuffer = oReq.response;
-  	    if (arrayBuffer) {
-  	        gif = new GIF(arrayBuffer);
-  	        var frames = gif.decompressFrames(true);
-  	        // render the gif
-  	        renderGIF(frames);
-  	    }
-  	};
-  	oReq.send(null);
-  }
-
-
-  var playing = false;
-  var bEdgeDetect = false;
-  var bInvert = false;
-  var bGrayscale = false;
-  var pixelPercent = 100;
-  var loadedFrames;
 
 
   function renderGIF(frames){
-  	loadedFrames = frames;
+  	settings.loadedFrames = frames;
   //  console.log('frames = ', frames)
   	settings.frameIndex = 0;
 //    console.log('framcs width supposedly,', frames[0].dims.width)
@@ -163,7 +132,7 @@ setupInput( imgi )
 
   function renderFrame() {
   	// get the frame
-  	var frame = loadedFrames[settings.frameIndex];
+  	var frame = settings.loadedFrames[settings.frameIndex];
   	var start = new Date().getTime();
 
   	gifCtx.clearRect(0, 0, c.width, c.height);
@@ -171,13 +140,13 @@ setupInput( imgi )
   	drawPatch(frame);
 
   	// perform manipulation
-  	manipulate(gifCanvas, gifCtx);
+  	manipulate(gifCanvas, gifCtx, settings);
 
   	// update the frame index
-    if( loadedFrames.length ){
+    if( settings.loadedFrames.length ){
 
     	settings.frameIndex++;
-    	if(settings.frameIndex >= loadedFrames.length){
+    	if(settings.frameIndex >= settings.loadedFrames.length){
     		settings.frameIndex = 0;
     	}
 
@@ -186,7 +155,7 @@ setupInput( imgi )
 
     	if(settings.playing){
     		// delay the next gif frame
-        flashenSvg(c.width, c.height, ct);
+        flashenSvg(c.width, c.height, ct, settings, sendToFlaschen, drawFlash);
 
     		setTimeout(function(){
     			renderFrame()//requestAnimationFrame(renderFrame);
