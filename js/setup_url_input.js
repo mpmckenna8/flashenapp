@@ -84,6 +84,7 @@ function setupInput (imgi, settings, renderGIF, c, gifCanvas, playpause, renderF
       //    settings.playing = true;
           settings.url.value = linksplit;
           loadGIF(settings.gif, settings, renderGIF, c, gifCanvas, playpause, renderFrame)
+
         }
 
       })

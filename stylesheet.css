@@ -25,6 +25,9 @@ label {
 }
 
 
+#text_input_div {
+  display: none
+}
 
 input#contcheck {
   width: 13px;
