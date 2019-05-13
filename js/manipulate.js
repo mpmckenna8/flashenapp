@@ -5,10 +5,10 @@
   var grayscale = require('./greyscale.js')
 
 
-function manipulate(gifCanvas, gifCtx, settings) {
+function manipulate(settings) {
 
-  var imageData = gifCtx.getImageData(0, 0, gifCanvas.width, gifCanvas.height);
-  var other = gifCtx.createImageData(gifCanvas.width, gifCanvas.height);
+  var imageData = settings.gifCtx.getImageData(0, 0, settings.gifCanvas.width, settings.gifCanvas.height);
+  var other = settings.gifCtx.createImageData(settings.gifCanvas.width, settings.gifCanvas.height);
 
   if( settings.bEdgeDetect ){
     imageData = edge(imageData.data, other);
@@ -23,19 +23,19 @@ function manipulate(gifCanvas, gifCtx, settings) {
   }
 
   // do pixelation
-  var pixelsX = 5 + Math.floor(settings.pixelPercent / 100 * (c.width - 5));
-  var pixelsY = (pixelsX * c.height) / c.width;
+  var pixelsX = 5 + Math.floor(settings.pixelPercent / 100 * (settings.c.width - 5));
+  var pixelsY = (pixelsX * settings.c.height) / settings.c.width;
 
   if(settings.pixelPercent != 100){
-    ctx.mozImageSmoothingEnabled = false;
-    ctx.webkitImageSmoothingEnabled = false;
-    ctx.imageSmoothingEnabled = false;
+    settings.ctx.mozImageSmoothingEnabled = false;
+    settings.ctx.webkitImageSmoothingEnabled = false;
+    settings.ctx.imageSmoothingEnabled = false;
   }
 
 
-  ctx.putImageData(imageData, 0, 0);
-  ctx.drawImage(c, 0, 0, c.width, c.height, 0, 0, pixelsX, pixelsY);
-  ctx.drawImage(c, 0, 0, pixelsX, pixelsY, 0, 0, c.width, c.height);
+  settings.ctx.putImageData(imageData, 0, 0);
+  settings.ctx.drawImage(settings.c, 0, 0, settings.c.width, settings.c.height, 0, 0, pixelsX, pixelsY);
+  settings.ctx.drawImage(settings.c, 0, 0, pixelsX, pixelsY, 0, 0, settings.c.width, settings.c.height);
 
 }
 

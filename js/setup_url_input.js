@@ -1,4 +1,4 @@
-function setupInput (imgi, gif, settings, renderGIF ) {
+function setupInput (imgi, settings, renderGIF, c, gifCanvas, playpause, renderFrame ) {
 
   var linkinput = d3.select('#linkin')
   linkinput.on('keydown', function (err, d, e) {
@@ -83,7 +83,7 @@ function setupInput (imgi, gif, settings, renderGIF ) {
           console.log('need to do gif stuff')
       //    settings.playing = true;
           settings.url.value = linksplit;
-          loadGIF(gif, settings, renderGIF)
+          loadGIF(settings.gif, settings, renderGIF, c, gifCanvas, playpause, renderFrame)
         }
 
       })

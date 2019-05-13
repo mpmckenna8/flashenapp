@@ -2,7 +2,7 @@
 var d3 = require('d3')
 
 
-module.exports = function( sendToFlaschen, settings, flash, imgi, ct, keepsending  ) {
+module.exports = function( sendToFlaschen, settings, flash, imgi, keepsending  ) {
 
   // Handle click on the button to update the flashentaschen
   d3.select('#updateBut')
@@ -20,7 +20,7 @@ module.exports = function( sendToFlaschen, settings, flash, imgi, ct, keepsendin
 
         console.log('checkedout', d, flash)
 
-        flashenSvg(imgi.width, imgi.height, ct)
+        flashenSvg(imgi.width, imgi.height, settings.ct)
 
         if (this.checked) {
 

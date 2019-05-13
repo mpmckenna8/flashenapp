@@ -25,5 +25,22 @@ module.exports = {
   bGrayscale: false,
   pixelPercent: 100,
   loadedFrames: null,
+  src: 'https://i.ytimg.com/vi/1pH5c1JkhLU/hqdefault.jpg',
+  frameImageData: null,
+
+  gif: null,
+
+  c: null,
+  ctx: null,
+
+  gifCanvas: null,
+  gifCtx: null,
+
+  display_canvas: document.getElementById('mycanvas'),
+
+  tempCanvas: null,
+  tempCtx: null,
+  ct: null
+
 
 }
