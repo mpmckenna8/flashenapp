@@ -68,20 +68,17 @@ settings.tempCtx = settings.tempCanvas.getContext('2d')
 
 
 
-setup_svg( settings );
 
-
-setUp_ui( sendToFlaschen, settings, flash, imgi, keepsending )
 
 
 // basic flow of the app
 // set up text input and will load and show inital image and allow all the
 // stuff to work
 
+// setup things
 
+setUp_ui( sendToFlaschen, settings, flash, imgi, keepsending )
 
+setup_svg( settings );
 
-  // default gif
-
-
-  setupInput( imgi, settings, renderGIF, settings.c, settings.gifCanvas, playpause, renderFrame )
+setupInput( imgi, settings, renderGIF, settings.c, settings.gifCanvas, playpause, renderFrame )
