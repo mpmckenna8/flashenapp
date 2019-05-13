@@ -29,6 +29,17 @@ module.exports = function( sendToFlaschen, settings, flash, imgi, keepsending  )
         }
       })
 
+      d3.select('#colorChooser')
+         .on('change',  function(d) {
+
+            console.log('d is ', settings)
+            console.log('this is', this.value)
+            let rgbobj = hexToRgb(this.value);
+            settings.draw_color = (rgbobj) ;
+            console.log('color change', settings.draw_color)
+
+
+          })
 
 
 }

@@ -4,6 +4,9 @@ var flash = require('flaschenode')
 var d3 = require('d3')
 let Jimp = require('jimp')
 
+var Pixel = require('./pixer.js')
+
+
 let initFlash = require('./initflash.js')
 let setUpLayerSelect = require('./js/setuplayerselect.js')
 let setUp_ui = require('./js/setup_ui.js')
@@ -76,9 +79,52 @@ settings.tempCtx = settings.tempCanvas.getContext('2d')
 // stuff to work
 
 // setup things
+setup_svg( settings, drawFlash );
+
+
 
 setUp_ui( sendToFlaschen, settings, flash, imgi, keepsending )
 
-setup_svg( settings );
 
 setupInput( imgi, settings, renderGIF, settings.c, settings.gifCanvas, playpause, renderFrame )
+
+
+
+
+function resetPixels() {
+  console.log('need to reset pixels')
+
+  let newpixels = [];
+  d3.selectAll('rect')
+    .attr('fill', 'rbg(1,1,1)')
+
+    for (let y = 0; y < settings.screenHeight; y++) {
+      for (let x = 0; x < settings.screenWidth; x++) {
+        //  console.log(x)
+        newpixels.push(new Pixel(x, y))
+      }
+    }
+
+    pixels =  newpixels;
+    sendToFlaschen(pixels, flash)
+
+}
+
+
+
+
+
+function hexToRgb(hex) {
+    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+        return r + r + g + g + b + b;
+    });
+
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}

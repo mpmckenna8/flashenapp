@@ -40,7 +40,11 @@ module.exports = {
 
   tempCanvas: null,
   tempCtx: null,
-  ct: null
+  ct: null,
+  drawing: false,
+
+  draw_color: {r:0, g:0, b:0}
+
 
 
 }
