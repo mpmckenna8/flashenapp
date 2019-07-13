@@ -1,7 +1,7 @@
 // a thing that runs when a gif is given as an input
 
 // load a gif with the current input url value
-function loadGIF( gif, settings, renderGIF, c, gifCanvas, playpause, rnderFrame ){
+function loadGIF( gif, settings, renderGIF, c, gifCanvas, playpause, renderFrame ){
   var oReq = new XMLHttpRequest();
   oReq.open("GET", settings.url.value, true);
   oReq.responseType = "arraybuffer";

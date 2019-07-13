@@ -20,7 +20,9 @@ module.exports  = function( settings, flashenSvg, sendToFlaschen ) {
 
   //  add_text('over', ct, display_canvas, 0,200, settings.display_text.size)
 
-    flashenSvg( imager.width, imager.height, settings.ct, settings, sendToFlaschen, drawFlash );
+
+
+    flashenSvg( imager.width, imager.height, settings, sendToFlaschen, drawFlash );
 
   }
 

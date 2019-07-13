@@ -4,11 +4,11 @@ function renderGIF( frames, settings, c, gifCanvas, playpause, renderFrame ){
   settings.frameIndex = 0;
 //    console.log('framcs width supposedly,', frames[0].dims.width)
 
-    c.width = frames[0].dims.width;
-    c.height = frames[0].dims.height;
+    settings.c.width = frames[0].dims.width;
+    settings.c.height = frames[0].dims.height;
 
-    gifCanvas.width = c.width;
-    gifCanvas.height = c.height;
+    gifCanvas.width = settings.c.width;
+    gifCanvas.height = settings.c.height;
 
     if(!settings.playing){
       playpause(settings, renderFrame);

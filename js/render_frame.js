@@ -26,7 +26,7 @@
 
     	if(settings.playing){
     		// delay the next gif frame
-        flashenSvg(settings.c.width, settings.c.height, settings.ct, settings, sendToFlaschen, drawFlash);
+        flashenSvg(settings.c.width, settings.c.height, settings, sendToFlaschen, drawFlash);
 
     		setTimeout(function(){
     			renderFrame(settings)//requestAnimationFrame(renderFrame);

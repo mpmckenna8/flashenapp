@@ -20,7 +20,7 @@ module.exports = function( sendToFlaschen, settings, flash, imgi, keepsending  )
 
         console.log('checkedout', d, flash)
 
-        flashenSvg(imgi.width, imgi.height, settings.ct)
+        flashenSvg(imgi.width, imgi.height, settings, sendToFlaschen, drawFlash)
 
         if (this.checked) {
 

@@ -48,7 +48,6 @@ let imgi = image( settings, flashenSvg, sendToFlaschen );
 //'https://static.pexels.com/photos/17767/pexels-photo.jpg'
 
 // layerselect part trying to separate out
-setUpLayerSelect( flash )
 
 
 imgi.src = settings.src
@@ -77,6 +76,8 @@ settings.tempCtx = settings.tempCanvas.getContext('2d')
 // basic flow of the app
 // set up text input and will load and show inital image and allow all the
 // stuff to work
+
+setUpLayerSelect( flash )
 
 // setup things
 setup_svg( settings, drawFlash );
