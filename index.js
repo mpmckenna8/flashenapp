@@ -320,14 +320,17 @@ function keepsending() {
       canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
 //console.log(dataArray)
 
-    function draw() {
+    function draw(y1, y2) {
+
     	drawVisual = requestAnimationFrame(draw);
+
       analyser.getByteTimeDomainData(dataArray);
       // the background-color for the canvas set to black/transparent
       canvasCtx.fillStyle = 'rgb(0, 00, 00)';
       canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
     	canvasCtx.lineWidth = 8;
-      canvasCtx.strokeStyle = 'rgb(255, 0, 0)';
+      canvasCtx.strokeStyle = 'rgb(2,  255, 0)';
+
       canvasCtx.beginPath();
 
       var sliceWidth = WIDTH  / bufferLength;
@@ -338,20 +341,42 @@ function keepsending() {
           // for nothing and oscillates around that
           var v = (dataArray[i]) / 128.0;
       //    var myv = (dataArray[i] + (dataArray[i]-128.0) *5.0) / 128.0
-          var y = v * HEIGHT/2.0;
+          var y = v * HEIGHT/4;
           if(i === 0) {
               canvasCtx.moveTo(x, y);
+
             } else {
               canvasCtx.lineTo(x, y);
             }
             x += sliceWidth;
+
+
         }
-        canvasCtx.lineTo(WIDTH, HEIGHT/2);
+        canvasCtx.lineTo(WIDTH, HEIGHT/4);
         canvasCtx.stroke();
+
+      //  canvasCtx.fillStyle = 'rgb(0, 0, 0)';
+      //  canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+
+
+        var barWidth = (WIDTH / bufferLength) * 2.5;
+var barHeight;
+  x = 0;
+
+  for(var i = 0; i < bufferLength; i++) {
+          barHeight = dataArray[i];
+
+          canvasCtx.fillStyle = 'rgb(' + (barHeight+100) + ',50,250)';
+          canvasCtx.fillRect(x,HEIGHT-barHeight/2,barWidth,barHeight);
+
+          x += barWidth + 1;
+        }
+
+
 
     }
 
-  draw();
+    draw();
   },
         // Error callback
         function(err) {
